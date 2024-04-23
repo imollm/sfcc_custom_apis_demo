@@ -4,6 +4,11 @@
             "endpoint": "getHelloWorldMessage",
             "schema": "schema.yaml",
             "implementation": "script"
+        },
+        {
+            "endpoint": "getHelloWorldMessage",
+            "schema": "schema_v2.yaml",
+            "implementation": "script_v2"
         }
     ]
 }

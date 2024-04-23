@@ -1,0 +1,63 @@
+openapi: 3.0.0
+info:
+  version: 2.0.0
+  title: Hello World API
+components:
+  securitySchemes:
+    ShopperToken:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://xg3ree7p.api.commercecloud.salesforce.com/shopper/auth/v1/organizations/f_ecom_bfhq_007/oauth2/authorize
+          tokenUrl: https://xg3ree7p.api.commercecloud.salesforce.com/shopper/auth/v1/organizations/f_ecom_bfhq_007/oauth2/token
+          scopes:
+            c_helloWorld_r: Get a hello world message
+        clientCredentials:
+          tokenUrl: https://xg3ree7p.api.commercecloud.salesforce.com/shopper/auth/v1/organizations/f_ecom_bfhq_007/oauth2/token
+          scopes:
+            c_helloWorld_r: Get a hello world message
+paths:
+  /helloworld:
+    get:
+      summary: Get a hello world message
+      operationId: getHelloWorldMessage
+      parameters:
+        - in: query
+          name: c_name
+          required: true
+          schema:
+            type: string
+            minLength: 1
+        - in: query
+          name: siteId
+          required: true
+          schema:
+            type: string
+            minLength: 1
+        - in: query
+          name: locale
+          required: false
+          schema:
+            type: string
+            minLength: 1
+      responses:
+        "200":
+          description: Returns a hello world message with your name
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "400":
+          description: Missing query parameter c_name
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+security:
+  - ShopperToken: ["c_helloWorld_r"]
