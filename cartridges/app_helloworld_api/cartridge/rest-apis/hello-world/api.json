@@ -1,0 +1,9 @@
+{
+    "endpoints": [
+        {
+            "endpoint": "getHelloWorldMessage",
+            "schema": "schema.yaml",
+            "implementation": "script"
+        }
+    ]
+}
