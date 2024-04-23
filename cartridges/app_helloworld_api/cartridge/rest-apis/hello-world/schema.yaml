@@ -11,11 +11,23 @@ components:
           authorizationUrl: https://xg3ree7p.api.commercecloud.salesforce.com/shopper/auth/v1/organizations/f_ecom_bfhq_007/oauth2/authorize
           tokenUrl: https://xg3ree7p.api.commercecloud.salesforce.com/shopper/auth/v1/organizations/f_ecom_bfhq_007/oauth2/token
           scopes:
-            c_helloWorld_r: Get a hello world message
+            c_helloWorld_r: Ability for read
         clientCredentials:
           tokenUrl: https://xg3ree7p.api.commercecloud.salesforce.com/shopper/auth/v1/organizations/f_ecom_bfhq_007/oauth2/token
           scopes:
-            c_helloWorld_r: Get a hello world message
+            c_helloWorld_r: Ability for read
+    AmOAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://account.demandware.com/dwsso/oauth2/authorize
+          tokenUrl: https://account.demandware.com/dwsso/oauth2/access_token
+          scopes:
+            c_helloWorld_rw: Ability for read and write
+        clientCredentials:
+          tokenUrl: https://account.demandware.com/dwsso/oauth2/access_token
+          scopes:
+            c_helloWorld_rw: Ability for read and write
 paths:
   /helloworld:
     get:
