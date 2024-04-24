@@ -11,11 +11,11 @@ components:
           authorizationUrl: https://xg3ree7p.api.commercecloud.salesforce.com/shopper/auth/v1/organizations/f_ecom_bfhq_007/oauth2/authorize
           tokenUrl: https://xg3ree7p.api.commercecloud.salesforce.com/shopper/auth/v1/organizations/f_ecom_bfhq_007/oauth2/token
           scopes:
-            c_helloWorld_r: Ability for read
+            c_helloWorld_rw: Ability for read and write
         clientCredentials:
           tokenUrl: https://xg3ree7p.api.commercecloud.salesforce.com/shopper/auth/v1/organizations/f_ecom_bfhq_007/oauth2/token
           scopes:
-            c_helloWorld_r: Ability for read
+            c_helloWorld_rw: Ability for read and write
     AmOAuth2:
       type: oauth2
       flows:
@@ -56,5 +56,137 @@ paths:
                 properties:
                   message:
                     type: string
+    post:
+      summary: Post a hello world message
+      operationId: postHelloWorldMessage
+      parameters:
+        - in: query
+          name: siteId
+          required: true
+          schema:
+            type: string
+            minLength: 1
+        - in: query
+          name: locale
+          required: false
+          schema:
+            type: string
+            minLength: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - born
+              properties:
+                name:
+                  type: string
+                born:
+                  type: string
+                  format: date
+      responses:
+        "201":
+          description: Created a new hello world message
+    put:
+      summary: Update a hello world message
+      operationId: putHelloWorldMessage
+      parameters:
+        - in: query
+          name: siteId
+          required: true
+          schema:
+            type: string
+            minLength: 1
+        - in: query
+          name: locale
+          required: false
+          schema:
+            type: string
+            minLength: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - born
+              properties:
+                name:
+                  type: string
+                born:
+                  type: string
+                  format: date
+      responses:
+        "200":
+          description: Updated the hello world message
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+    patch:
+      summary: Partially update a hello world message
+      operationId: patchHelloWorldMessage
+      parameters:
+        - in: query
+          name: siteId
+          required: true
+          schema:
+            type: string
+            minLength: 1
+        - in: query
+          name: locale
+          required: false
+          schema:
+            type: string
+            minLength: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                born:
+                  type: string
+                  format: date
+      responses:
+        "200":
+          description: Partially updated the hello world message
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+    delete:
+      summary: Delete a hello world message
+      operationId: deleteHelloWorldMessage
+      parameters:
+        - in: query
+          name: c_name
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted the hello world message
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
 security:
-  - ShopperToken: ["c_helloWorld_r"]
+  - ShopperToken: ["c_helloWorld_rw"]
