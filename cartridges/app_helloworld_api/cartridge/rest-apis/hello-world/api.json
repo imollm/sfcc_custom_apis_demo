@@ -6,6 +6,26 @@
             "implementation": "script"
         },
         {
+            "endpoint": "postHelloWorldMessage",
+            "schema": "schema.yaml",
+            "implementation": "script"
+        },
+        {
+            "endpoint": "putHelloWorldMessage",
+            "schema": "schema.yaml",
+            "implementation": "script"
+        },
+        {
+            "endpoint": "patchHelloWorldMessage",
+            "schema": "schema.yaml",
+            "implementation": "script"
+        },
+        {
+            "endpoint": "deleteHelloWorldMessage",
+            "schema": "schema.yaml",
+            "implementation": "script"
+        },
+        {
             "endpoint": "getHelloWorldMessage",
             "schema": "schema_v2.yaml",
             "implementation": "script_v2"

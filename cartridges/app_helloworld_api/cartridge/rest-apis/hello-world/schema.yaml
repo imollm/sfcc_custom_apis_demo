@@ -73,9 +73,8 @@ paths:
             type: string
             minLength: 1
       requestBody:
-        required: true
         content:
-          application/json:
+          'application/json':
             schema:
               type: object
               required:
@@ -86,10 +85,16 @@ paths:
                   type: string
                 born:
                   type: string
-                  format: date
       responses:
         "201":
           description: Created a new hello world message
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
     put:
       summary: Update a hello world message
       operationId: putHelloWorldMessage
@@ -107,9 +112,8 @@ paths:
             type: string
             minLength: 1
       requestBody:
-        required: true
         content:
-          application/json:
+          'application/json':
             schema:
               type: object
               required:
@@ -120,7 +124,6 @@ paths:
                   type: string
                 born:
                   type: string
-                  format: date
       responses:
         "200":
           description: Updated the hello world message
@@ -148,9 +151,8 @@ paths:
             type: string
             minLength: 1
       requestBody:
-        required: true
         content:
-          application/json:
+          'application/json':
             schema:
               type: object
               properties:
@@ -158,7 +160,6 @@ paths:
                   type: string
                 born:
                   type: string
-                  format: date
       responses:
         "200":
           description: Partially updated the hello world message
@@ -173,6 +174,18 @@ paths:
       summary: Delete a hello world message
       operationId: deleteHelloWorldMessage
       parameters:
+        - in: query
+          name: siteId
+          required: true
+          schema:
+            type: string
+            minLength: 1
+        - in: query
+          name: locale
+          required: false
+          schema:
+            type: string
+            minLength: 1
         - in: query
           name: c_name
           required: true
