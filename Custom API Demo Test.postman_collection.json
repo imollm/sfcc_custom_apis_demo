@@ -1,0 +1,4156 @@
+{
+	"info": {
+		"_postman_id": "75bc5906-acc3-4be2-9ae3-14b7d194ef98",
+		"name": "Custom API Demo",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "27371038"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "SLAS",
+					"item": [
+						{
+							"name": "Guest User • Public Client",
+							"item": [
+								{
+									"name": "SLAS - Public Client - Guest - Authorize",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"function generateCodeVerifier() {",
+													"    return generateRandomString(96);",
+													"}",
+													"",
+													"function generateRandomString(length) {",
+													"    var text = \"\";",
+													"    var possible = \"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\";",
+													"    for (var i = 0; i < length; i++) {",
+													"        text += possible.charAt(Math.floor(Math.random() * possible.length));",
+													"    }",
+													"    return text;",
+													"}",
+													"",
+													"function generateCodeChallenge(code_verifier) {",
+													"    return CryptoJS.SHA256(code_verifier);",
+													"}",
+													"",
+													"function base64URL(string) {",
+													"    return string.toString(CryptoJS.enc.Base64).replace(/=/g, '').replace(/\\+/g, '-').replace(/\\//g, '_')",
+													"}",
+													"",
+													"var verifier = base64URL(generateCodeVerifier());",
+													"var challenge = base64URL(generateCodeChallenge(verifier));",
+													"",
+													"pm.collectionVariables.set(\"PUBLIC_GUEST_CODE_VERIFIER\", verifier);",
+													"pm.collectionVariables.set(\"PUBLIC_GUEST_CODE_CHALLENGE\", challenge);"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"let code = null;",
+													"let usid = null;",
+													"",
+													"pm.test(\"Status code is 303\", function () {",
+													"    pm.response.to.have.status(303);",
+													"    let location = pm.response.headers.get(\"Location\").split('?');",
+													"    let params = location[1].split('&');",
+													"    code = params.pop().substring(5);",
+													"    usid = params.pop().substring(5);",
+													"});",
+													"",
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"    var jsonBody = pm.response.json();",
+													"    code = jsonBody.code || jsonBody.authCode;",
+													"    usid = jsonBody.usid;",
+													"});",
+													"",
+													"console.log(`code is ${code}`);",
+													"console.log(`usid is ${usid}`);",
+													"if (code) pm.collectionVariables.set(\"authCode\", code);",
+													"if (usid) pm.collectionVariables.set(\"usid\", usid);",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"followRedirects": false
+									},
+									"request": {
+										"auth": {
+											"type": "noauth"
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/x-www-form-urlencoded"
+											}
+										],
+										"url": {
+											"raw": "https://{{shortCode}}.api.commercecloud.salesforce.com/shopper/auth/v1/organizations/{{organizationId}}/oauth2/authorize?redirect_uri={{slasRedirectUri}}&response_type=code&client_id={{slasPublicClientId}}&hint=guest&code_challenge={{PUBLIC_GUEST_CODE_CHALLENGE}}",
+											"protocol": "https",
+											"host": [
+												"{{shortCode}}",
+												"api",
+												"commercecloud",
+												"salesforce",
+												"com"
+											],
+											"path": [
+												"shopper",
+												"auth",
+												"v1",
+												"organizations",
+												"{{organizationId}}",
+												"oauth2",
+												"authorize"
+											],
+											"query": [
+												{
+													"key": "redirect_uri",
+													"value": "{{slasRedirectUri}}"
+												},
+												{
+													"key": "response_type",
+													"value": "code"
+												},
+												{
+													"key": "client_id",
+													"value": "{{slasPublicClientId}}"
+												},
+												{
+													"key": "hint",
+													"value": "guest"
+												},
+												{
+													"key": "code_challenge",
+													"value": "{{PUBLIC_GUEST_CODE_CHALLENGE}}"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "303 See Other",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/x-www-form-urlencoded"
+													}
+												],
+												"url": {
+													"raw": "https://{{shortCode}}.api.commercecloud.salesforce.com/shopper/auth/v1/organizations/{{organizationId}}/oauth2/authorize?redirect_uri={{slasRedirectUrl}}&response_type=code&client_id={{slasPublicClientId}}&hint=guest&code_challenge={{PUBLIC_GUEST_CODE_CHALLENGE}}",
+													"protocol": "https",
+													"host": [
+														"{{shortCode}}",
+														"api",
+														"commercecloud",
+														"salesforce",
+														"com"
+													],
+													"path": [
+														"shopper",
+														"auth",
+														"v1",
+														"organizations",
+														"{{organizationId}}",
+														"oauth2",
+														"authorize"
+													],
+													"query": [
+														{
+															"key": "redirect_uri",
+															"value": "{{slasRedirectUrl}}"
+														},
+														{
+															"key": "response_type",
+															"value": "code"
+														},
+														{
+															"key": "client_id",
+															"value": "{{slasPublicClientId}}"
+														},
+														{
+															"key": "hint",
+															"value": "guest"
+														},
+														{
+															"key": "code_challenge",
+															"value": "{{PUBLIC_GUEST_CODE_CHALLENGE}}"
+														}
+													]
+												}
+											},
+											"status": "See Other",
+											"code": 303,
+											"_postman_previewlanguage": "plain",
+											"header": [
+												{
+													"key": "Date",
+													"value": "Mon, 22 Apr 2024 15:58:18 GMT"
+												},
+												{
+													"key": "Content-Length",
+													"value": "0"
+												},
+												{
+													"key": "Connection",
+													"value": "keep-alive"
+												},
+												{
+													"key": "Location",
+													"value": "http://localhost:3000/callback?usid=7a493cc7-4f0e-4998-8f9f-91ced620f801&code=pFLefmWdFWNXqxj_RFq3SJRPJWuhOLQo_cPW0ZHkU0A"
+												},
+												{
+													"key": "CF-Ray",
+													"value": "8786d085393c86c9-MAD"
+												},
+												{
+													"key": "CF-Cache-Status",
+													"value": "DYNAMIC"
+												},
+												{
+													"key": "Cache-Control",
+													"value": "no-store"
+												},
+												{
+													"key": "Strict-Transport-Security",
+													"value": "max-age=31536000; includeSubDomains"
+												},
+												{
+													"key": "pragma",
+													"value": "no-cache"
+												},
+												{
+													"key": "x-correlation-id",
+													"value": "8786d085393c86c9"
+												},
+												{
+													"key": "x-ratelimit-1m-limit",
+													"value": "500"
+												},
+												{
+													"key": "x-ratelimit-1m-limit",
+													"value": "850000"
+												},
+												{
+													"key": "x-ratelimit-1m-remaining",
+													"value": "499"
+												},
+												{
+													"key": "x-ratelimit-1m-remaining",
+													"value": "832230"
+												},
+												{
+													"key": "x-ratelimit-1m-reset",
+													"value": "41475"
+												},
+												{
+													"key": "x-ratelimit-1m-reset",
+													"value": "41474"
+												},
+												{
+													"key": "Vary",
+													"value": "Accept-Encoding"
+												},
+												{
+													"key": "Server",
+													"value": "cloudflare"
+												}
+											],
+											"cookie": [],
+											"body": null
+										}
+									]
+								},
+								{
+									"name": "SLAS - Public Client - Guest - Access Token",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"var jsonBody= pm.response.json();",
+													"pm.collectionVariables.set(\"accessToken\", jsonBody.access_token);",
+													"pm.collectionVariables.set(\"guestPublicRefreshToken\", jsonBody.refresh_token);",
+													"pm.collectionVariables.set(\"customerID\", jsonBody.customer_id);",
+													"pm.collectionVariables.set(\"usid\", jsonBody.usid);"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "noauth"
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/x-www-form-urlencoded"
+											}
+										],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "code",
+													"value": "{{authCode}}",
+													"type": "text"
+												},
+												{
+													"key": "grant_type",
+													"value": "authorization_code_pkce",
+													"type": "text"
+												},
+												{
+													"key": "redirect_uri",
+													"value": "{{slasRedirectUri}}",
+													"type": "text"
+												},
+												{
+													"key": "code_verifier",
+													"value": "{{PUBLIC_GUEST_CODE_VERIFIER}}",
+													"type": "text"
+												},
+												{
+													"key": "channel_id",
+													"value": "{{siteID}}",
+													"type": "text"
+												},
+												{
+													"key": "client_id",
+													"value": "{{slasPublicClientId}}",
+													"type": "text"
+												},
+												{
+													"key": "usid",
+													"value": "{{usid}}",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "https://{{shortCode}}.api.commercecloud.salesforce.com/shopper/auth/v1/organizations/{{organizationId}}/oauth2/token",
+											"protocol": "https",
+											"host": [
+												"{{shortCode}}",
+												"api",
+												"commercecloud",
+												"salesforce",
+												"com"
+											],
+											"path": [
+												"shopper",
+												"auth",
+												"v1",
+												"organizations",
+												"{{organizationId}}",
+												"oauth2",
+												"token"
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "200 OK",
+											"originalRequest": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/x-www-form-urlencoded"
+													}
+												],
+												"body": {
+													"mode": "urlencoded",
+													"urlencoded": [
+														{
+															"key": "code",
+															"value": "{{auth_code}}",
+															"type": "text"
+														},
+														{
+															"key": "grant_type",
+															"value": "authorization_code_pkce",
+															"type": "text"
+														},
+														{
+															"key": "redirect_uri",
+															"value": "{{slasRedirectUrl}}",
+															"type": "text"
+														},
+														{
+															"key": "code_verifier",
+															"value": "{{PUBLIC_GUEST_CODE_VERIFIER}}",
+															"type": "text"
+														},
+														{
+															"key": "channel_id",
+															"value": "{{siteID}}",
+															"type": "text"
+														},
+														{
+															"key": "client_id",
+															"value": "{{slasPublicClientId}}",
+															"type": "text"
+														},
+														{
+															"key": "usid",
+															"value": "{{usid}}",
+															"type": "text"
+														}
+													]
+												},
+												"url": {
+													"raw": "https://{{shortCode}}.api.commercecloud.salesforce.com/shopper/auth/v1/organizations/{{organizationId}}/oauth2/token",
+													"protocol": "https",
+													"host": [
+														"{{shortCode}}",
+														"api",
+														"commercecloud",
+														"salesforce",
+														"com"
+													],
+													"path": [
+														"shopper",
+														"auth",
+														"v1",
+														"organizations",
+														"{{organizationId}}",
+														"oauth2",
+														"token"
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Date",
+													"value": "Mon, 22 Apr 2024 15:58:26 GMT"
+												},
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												},
+												{
+													"key": "Transfer-Encoding",
+													"value": "chunked"
+												},
+												{
+													"key": "Connection",
+													"value": "keep-alive"
+												},
+												{
+													"key": "CF-Ray",
+													"value": "8786d0b7791a86c9-MAD"
+												},
+												{
+													"key": "CF-Cache-Status",
+													"value": "DYNAMIC"
+												},
+												{
+													"key": "Cache-Control",
+													"value": "no-store"
+												},
+												{
+													"key": "Content-Encoding",
+													"value": "gzip"
+												},
+												{
+													"key": "Strict-Transport-Security",
+													"value": "max-age=31536000; includeSubDomains"
+												},
+												{
+													"key": "Vary",
+													"value": "Accept-Encoding, User-Agent"
+												},
+												{
+													"key": "pragma",
+													"value": "no-cache"
+												},
+												{
+													"key": "x-correlation-id",
+													"value": "8786d0b7791a86c9"
+												},
+												{
+													"key": "x-ratelimit-1m-limit",
+													"value": "500"
+												},
+												{
+													"key": "x-ratelimit-1m-limit",
+													"value": "850000"
+												},
+												{
+													"key": "x-ratelimit-1m-remaining",
+													"value": "498"
+												},
+												{
+													"key": "x-ratelimit-1m-remaining",
+													"value": "824647"
+												},
+												{
+													"key": "x-ratelimit-1m-reset",
+													"value": "33484"
+												},
+												{
+													"key": "x-ratelimit-1m-reset",
+													"value": "33483"
+												},
+												{
+													"key": "Server",
+													"value": "cloudflare"
+												}
+											],
+											"cookie": [],
+											"body": "{\n    \"access_token\": \"eyJ2ZXIiOiIxLjAiLCJqa3UiOiJzbGFzL3Byb2QvYmZocV8wMDciLCJraWQiOiI1MDk2NGIzYi03ZDU3LTQ0MDItOTJmZS0zMGQzMzIyYTRmNTMiLCJ0eXAiOiJqd3QiLCJjbHYiOiJKMi4zLjQiLCJhbGciOiJFUzI1NiJ9.eyJhdXQiOiJHVUlEIiwic2NwIjoic2ZjYy5zaG9wcGVyLW15YWNjb3VudC5iYXNrZXRzIHNmY2Muc2hvcHBlci1kaXNjb3Zlcnktc2VhcmNoIHNmY2Muc2hvcHBlci1teWFjY291bnQuYWRkcmVzc2VzIHNmY2Muc2hvcHBlci1wcm9kdWN0cyBzZmNjLnNob3BwZXItbXlhY2NvdW50LnJ3IHNmY2Muc2hvcHBlci1teWFjY291bnQucGF5bWVudGluc3RydW1lbnRzIHNmY2Muc2hvcHBlci1jdXN0b21lcnMubG9naW4gc2ZjYy5zaG9wcGVyLXN0b3JlcyBjX2hlbGxvV29ybGRfciBzZmNjLnNob3BwZXItbXlhY2NvdW50Lm9yZGVycyBzZmNjLnNob3BwZXItYmFza2V0cy1vcmRlcnMgc2ZjYy5zaG9wcGVyLWN1c3RvbWVycy5yZWdpc3RlciBzZmNjLnNob3BwZXItbXlhY2NvdW50LmFkZHJlc3Nlcy5ydyBzZmNjLnNob3BwZXItbXlhY2NvdW50LnByb2R1Y3RsaXN0cy5ydyBzZmNjLnNob3BwZXItcHJvZHVjdGxpc3RzIHNmY2Muc2hvcHBlci1wcm9tb3Rpb25zIHNmY2Muc2hvcHBlci1iYXNrZXRzLW9yZGVycy5ydyBzZmNjLnNob3BwZXItZ2lmdC1jZXJ0aWZpY2F0ZXMgc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5wYXltZW50aW5zdHJ1bWVudHMucncgc2ZjYy5zaG9wcGVyLXByb2R1Y3Qtc2VhcmNoIHNmY2Muc2hvcHBlci1teWFjY291bnQucHJvZHVjdGxpc3RzIHNmY2Muc2hvcHBlci1jYXRlZ29yaWVzIHNmY2Muc2hvcHBlci1teWFjY291bnQiLCJzdWIiOiJjYy1zbGFzOjpiZmhxXzAwNzo6c2NpZDo2MDFlMjZkZi0wZjQwLTRkNTMtOWQ1ZC0xZjQxY2Q5OGE0ZDc6OnVzaWQ6N2E0OTNjYzctNGYwZS00OTk4LThmOWYtOTFjZWQ2MjBmODAxIiwiY3R4Ijoic2xhcyIsImlzcyI6InNsYXMvcHJvZC9iZmhxXzAwNyIsImlzdCI6MSwiZG50IjoiMCIsImF1ZCI6ImNvbW1lcmNlY2xvdWQvcHJvZC9iZmhxXzAwNyIsIm5iZiI6MTcxMzgwMTQ3Niwic3R5IjoiVXNlciIsImlzYiI6InVpZG86c2xhczo6dXBuOkd1ZXN0Ojp1aWRuOkd1ZXN0IFVzZXI6OmdjaWQ6YWJsMGNZbXJsSHdYQVJsZXdVeHFZWW1ySTI6OmNoaWQ6UmVmQXJjaCIsImV4cCI6MTcxMzgwMzMwNiwiaWF0IjoxNzEzODAxNTA2LCJqdGkiOiJDMkM3NjE1MDc4OTcwLTE2MTQ3OTExOTI1MTU4NTM0NjY1ODUzMTg2In0.9ckjEjKtpsBcIS2R8t3DwnkjRfSVLaA5ri1H_ZZ62bRLl8nWNf4y1WftmFKNacuQE1Zl6D8K_iMbpEhahUtdjQ\",\n    \"id_token\": \"\",\n    \"refresh_token\": \"HbZB2PoyIeUqBZxgcDJM6QOjCp_bfllv598JP7Ybz9g\",\n    \"expires_in\": 1800,\n    \"refresh_token_expires_in\": 2592000,\n    \"token_type\": \"BEARER\",\n    \"usid\": \"7a493cc7-4f0e-4998-8f9f-91ced620f801\",\n    \"customer_id\": \"abl0cYmrlHwXARlewUxqYYmrI2\",\n    \"enc_user_id\": \"adb831a7fdd83dd1e2a309ce7591dff8\",\n    \"idp_access_token\": \"\",\n    \"idp_refresh_token\": \"\"\n}"
+										}
+									]
+								},
+								{
+									"name": "SLAS - Public Client - Guest - Get Refresh Guest Access Token",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"var jsonBody= pm.response.json();",
+													"pm.collectionVariables.set(\"accessToken\", jsonBody.access_token);",
+													"pm.collectionVariables.set(\"guestPublicRefreshToken\", jsonBody.refresh_token);",
+													"pm.collectionVariables.set(\"customerID\", jsonBody.customer_id);",
+													"pm.collectionVariables.set(\"usid\", jsonBody.usid);"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "noauth"
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/x-www-form-urlencoded"
+											}
+										],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "refresh_token",
+													"value": "{{guestPublicRefreshToken}}",
+													"type": "text"
+												},
+												{
+													"key": "grant_type",
+													"value": "refresh_token",
+													"type": "text"
+												},
+												{
+													"key": "client_id",
+													"value": "{{slasPublicClientId}}",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "https://{{shortCode}}.api.commercecloud.salesforce.com/shopper/auth/v1/organizations/{{organizationId}}/oauth2/token",
+											"protocol": "https",
+											"host": [
+												"{{shortCode}}",
+												"api",
+												"commercecloud",
+												"salesforce",
+												"com"
+											],
+											"path": [
+												"shopper",
+												"auth",
+												"v1",
+												"organizations",
+												"{{organizationId}}",
+												"oauth2",
+												"token"
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "200 OK",
+											"originalRequest": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/x-www-form-urlencoded"
+													}
+												],
+												"body": {
+													"mode": "urlencoded",
+													"urlencoded": [
+														{
+															"key": "refresh_token",
+															"value": "{{guestPublicRefreshToken}}",
+															"type": "text"
+														},
+														{
+															"key": "grant_type",
+															"value": "refresh_token",
+															"type": "text"
+														},
+														{
+															"key": "client_id",
+															"value": "{{slasPublicClientId}}",
+															"type": "text"
+														}
+													]
+												},
+												"url": {
+													"raw": "https://{{shortCode}}.api.commercecloud.salesforce.com/shopper/auth/v1/organizations/{{organizationId}}/oauth2/token",
+													"protocol": "https",
+													"host": [
+														"{{shortCode}}",
+														"api",
+														"commercecloud",
+														"salesforce",
+														"com"
+													],
+													"path": [
+														"shopper",
+														"auth",
+														"v1",
+														"organizations",
+														"{{organizationId}}",
+														"oauth2",
+														"token"
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Date",
+													"value": "Tue, 23 Apr 2024 08:07:19 GMT"
+												},
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												},
+												{
+													"key": "Transfer-Encoding",
+													"value": "chunked"
+												},
+												{
+													"key": "Connection",
+													"value": "keep-alive"
+												},
+												{
+													"key": "CF-Ray",
+													"value": "878c5bf88b13669b-MAD"
+												},
+												{
+													"key": "CF-Cache-Status",
+													"value": "DYNAMIC"
+												},
+												{
+													"key": "Cache-Control",
+													"value": "no-store"
+												},
+												{
+													"key": "Content-Encoding",
+													"value": "gzip"
+												},
+												{
+													"key": "Strict-Transport-Security",
+													"value": "max-age=31536000; includeSubDomains"
+												},
+												{
+													"key": "Vary",
+													"value": "Accept-Encoding, User-Agent"
+												},
+												{
+													"key": "pragma",
+													"value": "no-cache"
+												},
+												{
+													"key": "x-correlation-id",
+													"value": "878c5bf88b13669b"
+												},
+												{
+													"key": "x-ratelimit-1m-limit",
+													"value": "500"
+												},
+												{
+													"key": "x-ratelimit-1m-limit",
+													"value": "850000"
+												},
+												{
+													"key": "x-ratelimit-1m-remaining",
+													"value": "497"
+												},
+												{
+													"key": "x-ratelimit-1m-remaining",
+													"value": "831492"
+												},
+												{
+													"key": "x-ratelimit-1m-reset",
+													"value": "40819"
+												},
+												{
+													"key": "x-ratelimit-1m-reset",
+													"value": "40818"
+												},
+												{
+													"key": "Server",
+													"value": "cloudflare"
+												}
+											],
+											"cookie": [],
+											"body": "{\n    \"access_token\": \"eyJ2ZXIiOiIxLjAiLCJqa3UiOiJzbGFzL3Byb2QvYmZocV8wMDciLCJraWQiOiI1MDk2NGIzYi03ZDU3LTQ0MDItOTJmZS0zMGQzMzIyYTRmNTMiLCJ0eXAiOiJqd3QiLCJjbHYiOiJKMi4zLjQiLCJhbGciOiJFUzI1NiJ9.eyJhdXQiOiJHVUlEIiwic2NwIjoic2ZjYy5zaG9wcGVyLW15YWNjb3VudC5iYXNrZXRzIHNmY2Muc2hvcHBlci1kaXNjb3Zlcnktc2VhcmNoIHNmY2Muc2hvcHBlci1teWFjY291bnQuYWRkcmVzc2VzIHNmY2Muc2hvcHBlci1wcm9kdWN0cyBzZmNjLnNob3BwZXItbXlhY2NvdW50LnJ3IHNmY2Muc2hvcHBlci1teWFjY291bnQucGF5bWVudGluc3RydW1lbnRzIHNmY2Muc2hvcHBlci1jdXN0b21lcnMubG9naW4gc2ZjYy5zaG9wcGVyLXN0b3JlcyBjX2hlbGxvV29ybGRfciBzZmNjLnNob3BwZXItbXlhY2NvdW50Lm9yZGVycyBzZmNjLnNob3BwZXItYmFza2V0cy1vcmRlcnMgc2ZjYy5zaG9wcGVyLWN1c3RvbWVycy5yZWdpc3RlciBzZmNjLnNob3BwZXItbXlhY2NvdW50LmFkZHJlc3Nlcy5ydyBzZmNjLnNob3BwZXItbXlhY2NvdW50LnByb2R1Y3RsaXN0cy5ydyBzZmNjLnNob3BwZXItcHJvZHVjdGxpc3RzIHNmY2Muc2hvcHBlci1wcm9tb3Rpb25zIHNmY2Muc2hvcHBlci1iYXNrZXRzLW9yZGVycy5ydyBzZmNjLnNob3BwZXItZ2lmdC1jZXJ0aWZpY2F0ZXMgc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5wYXltZW50aW5zdHJ1bWVudHMucncgc2ZjYy5zaG9wcGVyLXByb2R1Y3Qtc2VhcmNoIHNmY2Muc2hvcHBlci1teWFjY291bnQucHJvZHVjdGxpc3RzIHNmY2Muc2hvcHBlci1jYXRlZ29yaWVzIHNmY2Muc2hvcHBlci1teWFjY291bnQiLCJzdWIiOiJjYy1zbGFzOjpiZmhxXzAwNzo6c2NpZDo2MDFlMjZkZi0wZjQwLTRkNTMtOWQ1ZC0xZjQxY2Q5OGE0ZDc6OnVzaWQ6NGVhYWY4ZmItZTAxMC00MGJlLTg0MDktYzkxYjFkNWEyYzIzIiwiY3R4Ijoic2xhcyIsImlzcyI6InNsYXMvcHJvZC9iZmhxXzAwNyIsImlzdCI6MSwiZG50IjoiMCIsImF1ZCI6ImNvbW1lcmNlY2xvdWQvcHJvZC9iZmhxXzAwNyIsIm5iZiI6MTcxMzg1OTYwOSwic3R5IjoiVXNlciIsImlzYiI6InVpZG86c2xhczo6dXBuOkd1ZXN0Ojp1aWRuOkd1ZXN0IFVzZXI6OmdjaWQ6YmRsZXRGd3V3MnhLZ1J4cmFWa2JZWWtlaEo6OmNoaWQ6UmVmQXJjaCIsImV4cCI6MTcxMzg2MTQzOSwiaWF0IjoxNzEzODU5NjM5LCJqdGkiOiJDMkM3NjE1MDc4OTcwLTE2MTQ3OTExOTI1MjE2NjY3MzI3ODM3OTQ1In0.vfBgUg9JP0zoZEjQttSqG4h81c5QwBnMuLUK-cqbdw8C6mx0IOC8jDUBntMrVQTAHRgG9Vkf2pCkPHTNw8YvkA\",\n    \"id_token\": \"\",\n    \"refresh_token\": \"AJDwp_OzOJAgRk3l3qAoX2V_ue0syQZzENFYuuPoQcM\",\n    \"expires_in\": 1800,\n    \"refresh_token_expires_in\": 2592000,\n    \"token_type\": \"BEARER\",\n    \"usid\": \"4eaaf8fb-e010-40be-8409-c91b1d5a2c23\",\n    \"customer_id\": \"bdletFwuw2xKgRxraVkbYYkehJ\",\n    \"enc_user_id\": \"adb831a7fdd83dd1e2a309ce7591dff8\",\n    \"idp_access_token\": null,\n    \"idp_refresh_token\": \"\"\n}"
+										}
+									]
+								}
+							],
+							"description": "- Single-page web app (for example, a PWA Kit storefront)\n- Mobile app (Android or iOS)"
+						},
+						{
+							"name": "Ecom User • Public Client",
+							"item": [
+								{
+									"name": "SLAS - Public Client - Ecom User - Authorize",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"function generateCodeVerifier() {",
+													"    return generateRandomString(96);",
+													"}",
+													"",
+													"function generateRandomString(length) {",
+													"    var text = \"\";",
+													"    var possible = \"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\";",
+													"    for (var i = 0; i < length; i++) {",
+													"        text += possible.charAt(Math.floor(Math.random() * possible.length));",
+													"    }",
+													"    return text;",
+													"}",
+													"",
+													"function generateCodeChallenge(code_verifier) {",
+													"    return CryptoJS.SHA256(code_verifier);",
+													"}",
+													"",
+													"function base64URL(string) {",
+													"    return string.toString(CryptoJS.enc.Base64).replace(/=/g, '').replace(/\\+/g, '-').replace(/\\//g, '_')",
+													"}",
+													"",
+													"var verifier = base64URL(generateCodeVerifier());",
+													"var challenge = base64URL(generateCodeChallenge(verifier));",
+													"",
+													"pm.collectionVariables.set(\"PUBLIC_ECOM_CODE_VERIFIER\", verifier);",
+													"pm.collectionVariables.set(\"PUBLIC_ECOM_CODE_CHALLENGE\", challenge);"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"let code = null;",
+													"let usid = null;",
+													"",
+													"pm.test(\"Status code is 303\", function () {",
+													"    pm.response.to.have.status(303);",
+													"    let location = pm.response.headers.get(\"Location\").split('?');",
+													"    let params = location[1].split('&');",
+													"    code = params.pop().substring(5);",
+													"    usid = params[0].substring(5);",
+													"});",
+													"",
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"    var jsonBody = pm.response.json();",
+													"    code = jsonBody.code || jsonBody.authCode;",
+													"    usid = jsonBody.usid;",
+													"});",
+													"",
+													"console.log(`code is ${code}`);",
+													"console.log(`usid is ${usid}`);",
+													"if (code) pm.collectionVariables.set(\"authCode\", code);",
+													"if (usid) pm.collectionVariables.set(\"usid\", usid);",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"followRedirects": false
+									},
+									"request": {
+										"auth": {
+											"type": "basic",
+											"basic": [
+												{
+													"key": "password",
+													"value": "{{shopperPassword}}",
+													"type": "string"
+												},
+												{
+													"key": "username",
+													"value": "{{shopperUserID}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/x-www-form-urlencoded"
+											}
+										],
+										"url": {
+											"raw": "https://{{shortCode}}.api.commercecloud.salesforce.com/shopper/auth/v1/organizations/{{organizationId}}/oauth2/login?client_id={{slasPublicClientId}}&channel_id={{siteID}}&redirect_uri={{slasRedirectUri}}&code_challenge={{PUBLIC_ECOM_CODE_CHALLENGE}}",
+											"protocol": "https",
+											"host": [
+												"{{shortCode}}",
+												"api",
+												"commercecloud",
+												"salesforce",
+												"com"
+											],
+											"path": [
+												"shopper",
+												"auth",
+												"v1",
+												"organizations",
+												"{{organizationId}}",
+												"oauth2",
+												"login"
+											],
+											"query": [
+												{
+													"key": "client_id",
+													"value": "{{slasPublicClientId}}"
+												},
+												{
+													"key": "channel_id",
+													"value": "{{siteID}}"
+												},
+												{
+													"key": "redirect_uri",
+													"value": "{{slasRedirectUri}}"
+												},
+												{
+													"key": "code_challenge",
+													"value": "{{PUBLIC_ECOM_CODE_CHALLENGE}}"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "303 See Other",
+											"originalRequest": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/x-www-form-urlencoded"
+													}
+												],
+												"url": {
+													"raw": "https://{{shortCode}}.api.commercecloud.salesforce.com/shopper/auth/v1/organizations/{{organizationId}}/oauth2/login?client_id={{slasPublicClientId}}&channel_id={{siteID}}&redirect_uri={{slasRedirectUrl}}&code_challenge={{PUBLIC_ECOM_CODE_CHALLENGE}}",
+													"protocol": "https",
+													"host": [
+														"{{shortCode}}",
+														"api",
+														"commercecloud",
+														"salesforce",
+														"com"
+													],
+													"path": [
+														"shopper",
+														"auth",
+														"v1",
+														"organizations",
+														"{{organizationId}}",
+														"oauth2",
+														"login"
+													],
+													"query": [
+														{
+															"key": "client_id",
+															"value": "{{slasPublicClientId}}"
+														},
+														{
+															"key": "channel_id",
+															"value": "{{siteID}}"
+														},
+														{
+															"key": "redirect_uri",
+															"value": "{{slasRedirectUrl}}"
+														},
+														{
+															"key": "code_challenge",
+															"value": "{{PUBLIC_ECOM_CODE_CHALLENGE}}"
+														}
+													]
+												}
+											},
+											"status": "See Other",
+											"code": 303,
+											"_postman_previewlanguage": "plain",
+											"header": [
+												{
+													"key": "Date",
+													"value": "Tue, 23 Apr 2024 07:50:11 GMT"
+												},
+												{
+													"key": "Content-Length",
+													"value": "0"
+												},
+												{
+													"key": "Connection",
+													"value": "keep-alive"
+												},
+												{
+													"key": "Location",
+													"value": "http://localhost:3000/callback?usid=e8f2bac0-a709-4898-9472-0e7fd7c58613&state=1713858611311&scope=openid%20offline_access&code=hdoMcXqdJtDcu2FaFHs00OQDt3VO9yXYCaPRb_hFiaY"
+												},
+												{
+													"key": "CF-Ray",
+													"value": "878c42deff496689-MAD"
+												},
+												{
+													"key": "CF-Cache-Status",
+													"value": "DYNAMIC"
+												},
+												{
+													"key": "Cache-Control",
+													"value": "no-store"
+												},
+												{
+													"key": "Strict-Transport-Security",
+													"value": "max-age=31536000; includeSubDomains"
+												},
+												{
+													"key": "pragma",
+													"value": "no-cache"
+												},
+												{
+													"key": "x-correlation-id",
+													"value": "878c42deff496689"
+												},
+												{
+													"key": "x-ratelimit-1m-limit",
+													"value": "500"
+												},
+												{
+													"key": "x-ratelimit-1m-limit",
+													"value": "850000"
+												},
+												{
+													"key": "x-ratelimit-1m-remaining",
+													"value": "499"
+												},
+												{
+													"key": "x-ratelimit-1m-remaining",
+													"value": "839267"
+												},
+												{
+													"key": "x-ratelimit-1m-reset",
+													"value": "48919"
+												},
+												{
+													"key": "x-ratelimit-1m-reset",
+													"value": "48917"
+												},
+												{
+													"key": "Vary",
+													"value": "Accept-Encoding"
+												},
+												{
+													"key": "Server",
+													"value": "cloudflare"
+												}
+											],
+											"cookie": [],
+											"body": null
+										}
+									]
+								},
+								{
+									"name": "SLAS - Public Client - Ecom User - Access Token",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"var jsonBody= pm.response.json();",
+													"pm.collectionVariables.set(\"accessToken\", jsonBody.access_token);",
+													"pm.collectionVariables.set(\"b2cPublicRefreshToken\", jsonBody.refresh_token);",
+													"pm.collectionVariables.set(\"customerID\", jsonBody.customer_id);",
+													"pm.collectionVariables.set(\"usid\", jsonBody.usid);"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disabledSystemHeaders": {
+											"user-agent": true
+										}
+									},
+									"request": {
+										"auth": {
+											"type": "noauth"
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/x-www-form-urlencoded"
+											}
+										],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "code",
+													"value": "{{authCode}}",
+													"type": "text"
+												},
+												{
+													"key": "grant_type",
+													"value": "authorization_code_pkce",
+													"type": "text"
+												},
+												{
+													"key": "redirect_uri",
+													"value": "{{slasRedirectUri}}",
+													"type": "text"
+												},
+												{
+													"key": "code_verifier",
+													"value": "{{PUBLIC_ECOM_CODE_VERIFIER}}",
+													"type": "text"
+												},
+												{
+													"key": "channel_id",
+													"value": "{{siteID}}",
+													"type": "text"
+												},
+												{
+													"key": "client_id",
+													"value": "{{slasPublicClientId}}",
+													"type": "text"
+												},
+												{
+													"key": "usid",
+													"value": "{{usid}}",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "https://{{shortCode}}.api.commercecloud.salesforce.com/shopper/auth/v1/organizations/{{organizationId}}/oauth2/token",
+											"protocol": "https",
+											"host": [
+												"{{shortCode}}",
+												"api",
+												"commercecloud",
+												"salesforce",
+												"com"
+											],
+											"path": [
+												"shopper",
+												"auth",
+												"v1",
+												"organizations",
+												"{{organizationId}}",
+												"oauth2",
+												"token"
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "200 OK",
+											"originalRequest": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/x-www-form-urlencoded"
+													}
+												],
+												"body": {
+													"mode": "urlencoded",
+													"urlencoded": [
+														{
+															"key": "code",
+															"value": "{{auth_code}}",
+															"type": "text"
+														},
+														{
+															"key": "grant_type",
+															"value": "authorization_code_pkce",
+															"type": "text"
+														},
+														{
+															"key": "redirect_uri",
+															"value": "{{slasRedirectUrl}}",
+															"type": "text"
+														},
+														{
+															"key": "code_verifier",
+															"value": "{{PUBLIC_ECOM_CODE_VERIFIER}}",
+															"type": "text"
+														},
+														{
+															"key": "channel_id",
+															"value": "{{siteID}}",
+															"type": "text"
+														},
+														{
+															"key": "client_id",
+															"value": "{{slasPublicClientId}}",
+															"type": "text"
+														},
+														{
+															"key": "usid",
+															"value": "{{usid}}",
+															"type": "text"
+														}
+													]
+												},
+												"url": {
+													"raw": "https://{{shortCode}}.api.commercecloud.salesforce.com/shopper/auth/v1/organizations/{{organizationId}}/oauth2/token",
+													"protocol": "https",
+													"host": [
+														"{{shortCode}}",
+														"api",
+														"commercecloud",
+														"salesforce",
+														"com"
+													],
+													"path": [
+														"shopper",
+														"auth",
+														"v1",
+														"organizations",
+														"{{organizationId}}",
+														"oauth2",
+														"token"
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Date",
+													"value": "Tue, 23 Apr 2024 07:50:18 GMT"
+												},
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												},
+												{
+													"key": "Transfer-Encoding",
+													"value": "chunked"
+												},
+												{
+													"key": "Connection",
+													"value": "keep-alive"
+												},
+												{
+													"key": "CF-Ray",
+													"value": "878c431018d86689-MAD"
+												},
+												{
+													"key": "CF-Cache-Status",
+													"value": "DYNAMIC"
+												},
+												{
+													"key": "Cache-Control",
+													"value": "no-store"
+												},
+												{
+													"key": "Content-Encoding",
+													"value": "gzip"
+												},
+												{
+													"key": "Strict-Transport-Security",
+													"value": "max-age=31536000; includeSubDomains"
+												},
+												{
+													"key": "Vary",
+													"value": "Accept-Encoding, User-Agent"
+												},
+												{
+													"key": "pragma",
+													"value": "no-cache"
+												},
+												{
+													"key": "x-correlation-id",
+													"value": "878c431018d86689"
+												},
+												{
+													"key": "x-ratelimit-1m-limit",
+													"value": "500"
+												},
+												{
+													"key": "x-ratelimit-1m-limit",
+													"value": "850000"
+												},
+												{
+													"key": "x-ratelimit-1m-remaining",
+													"value": "498"
+												},
+												{
+													"key": "x-ratelimit-1m-remaining",
+													"value": "831584"
+												},
+												{
+													"key": "x-ratelimit-1m-reset",
+													"value": "41065"
+												},
+												{
+													"key": "x-ratelimit-1m-reset",
+													"value": "41064"
+												},
+												{
+													"key": "Server",
+													"value": "cloudflare"
+												}
+											],
+											"cookie": [],
+											"body": "{\n    \"access_token\": \"eyJ2ZXIiOiIxLjAiLCJqa3UiOiJzbGFzL3Byb2QvYmZocV8wMDciLCJraWQiOiI1MDk2NGIzYi03ZDU3LTQ0MDItOTJmZS0zMGQzMzIyYTRmNTMiLCJ0eXAiOiJqd3QiLCJjbHYiOiJKMi4zLjQiLCJhbGciOiJFUzI1NiJ9.eyJhdXQiOiJHVUlEIiwic2NwIjoic2ZjYy5zaG9wcGVyLW15YWNjb3VudC5iYXNrZXRzIHNmY2Muc2hvcHBlci1kaXNjb3Zlcnktc2VhcmNoIHNmY2Muc2hvcHBlci1teWFjY291bnQuYWRkcmVzc2VzIHNmY2Muc2hvcHBlci1wcm9kdWN0cyBzZmNjLnNob3BwZXItbXlhY2NvdW50LnJ3IHNmY2Muc2hvcHBlci1teWFjY291bnQucGF5bWVudGluc3RydW1lbnRzIHNmY2Muc2hvcHBlci1jdXN0b21lcnMubG9naW4gc2ZjYy5zaG9wcGVyLXN0b3JlcyBjX2hlbGxvV29ybGRfciBzZmNjLnNob3BwZXItbXlhY2NvdW50Lm9yZGVycyBzZmNjLnNob3BwZXItYmFza2V0cy1vcmRlcnMgc2ZjYy5zaG9wcGVyLWN1c3RvbWVycy5yZWdpc3RlciBzZmNjLnNob3BwZXItbXlhY2NvdW50LmFkZHJlc3Nlcy5ydyBzZmNjLnNob3BwZXItbXlhY2NvdW50LnByb2R1Y3RsaXN0cy5ydyBzZmNjLnNob3BwZXItcHJvZHVjdGxpc3RzIHNmY2Muc2hvcHBlci1wcm9tb3Rpb25zIHNmY2Muc2hvcHBlci1iYXNrZXRzLW9yZGVycy5ydyBzZmNjLnNob3BwZXItZ2lmdC1jZXJ0aWZpY2F0ZXMgc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5wYXltZW50aW5zdHJ1bWVudHMucncgc2ZjYy5zaG9wcGVyLXByb2R1Y3Qtc2VhcmNoIHNmY2Muc2hvcHBlci1teWFjY291bnQucHJvZHVjdGxpc3RzIHNmY2Muc2hvcHBlci1jYXRlZ29yaWVzIHNmY2Muc2hvcHBlci1teWFjY291bnQiLCJzdWIiOiJjYy1zbGFzOjpiZmhxXzAwNzo6c2NpZDo2MDFlMjZkZi0wZjQwLTRkNTMtOWQ1ZC0xZjQxY2Q5OGE0ZDc6OnVzaWQ6ZThmMmJhYzAtYTcwOS00ODk4LTk0NzItMGU3ZmQ3YzU4NjEzIiwiY3R4Ijoic2xhcyIsImlzcyI6InNsYXMvcHJvZC9iZmhxXzAwNyIsImlzdCI6MSwiZG50IjoiMCIsImF1ZCI6ImNvbW1lcmNlY2xvdWQvcHJvZC9iZmhxXzAwNyIsIm5iZiI6MTcxMzg1ODU4OCwic3R5IjoiVXNlciIsImlzYiI6InVpZG86ZWNvbTo6dXBuOml2YW4ubW9sbC1tb2xsQGNhcGdlbWluaS5jb206OnVpZG46bnVsbCBNb2xsOjpnY2lkOmJjeHJGS2tLaEZ3WGFSd3JBVW1xWVltYkkyOjpyY2lkOmFiSGZENEVwUWlqU2dqRXVpQm9rREV2bTNUOjpjaGlkOlJlZkFyY2giLCJleHAiOjE3MTM4NjA0MTgsImlhdCI6MTcxMzg1ODYxOCwianRpIjoiQzJDNzYxNTA3ODk3MC0xNjE0NzkxMTkyNTIxNTQ2MjA4OTQ0MDU0NCJ9.8Wo_E-dbetcgKRaND0os8fIZyV6aRVYZZnbQo2WTqaUgiW8wtZiXxfxx7xMkNYldjbwvjfwpJRXIZsxHXwdy2Q\",\n    \"id_token\": \"eyJraWQiOiI5YTA5ZjFkYi0yNmYyLTQ4MjAtYWYyMi0zMjRkZTdmYjBkZTQiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJjYy1zbGFzOjpiZmhxXzAwNzo6c2NpZDo2MDFlMjZkZi0wZjQwLTRkNTMtOWQ1ZC0xZjQxY2Q5OGE0ZDc6OnVzaWQ6ZThmMmJhYzAtYTcwOS00ODk4LTk0NzItMGU3ZmQ3YzU4NjEzIiwiYXVkIjoiNjAxZTI2ZGYtMGY0MC00ZDUzLTlkNWQtMWY0MWNkOThhNGQ3IiwiaXNzIjoicHJkLnVzLnNob3BwZXIuY2Muc2FsZXNmb3JjZS5jb20iLCJuYW1lIjoiZWNvbSIsImV4cCI6MTcxMzg2MDQxOCwiaWF0IjoxNzEzODU4NjE4LCJlbWFpbCI6ImVjb20ifQ.H6WSaAaryM_QyJqKHNmSyrI0u6ddAqe298YL68Nptf3OL1mJuS3TJsvyAs6f6iIRrz0YclbRc1OpPrX7mYPf2ZrIKljU3fSNn99vlPl_VUU7smrB4fFWss8MM_GJRFPI-RYDsbgBztPl1gVWV3osXouFiVAXiOpxovRubUZDaVyLX2gFmYZ9zZJfjGXwc_enoqz6BeIne1iENgQI-4pnXRreTLhyaA1a8Q7ka28QqeYeuPnvj-xzVTF7-qhnrVfzanSjsS_tB5FDjl1xptj9a6OqF-24KMqzqXQeKwujaGjid93WHFLDvyM3CIh-5N1QZcF8crOoWl7zvLERf4xK5w\",\n    \"refresh_token\": \"w3QxmoweUgNUyy6TyAisaOpqWjf5rEjFerexLesNTUA\",\n    \"expires_in\": 1800,\n    \"refresh_token_expires_in\": 7776000,\n    \"token_type\": \"BEARER\",\n    \"usid\": \"e8f2bac0-a709-4898-9472-0e7fd7c58613\",\n    \"customer_id\": \"abHfD4EpQijSgjEuiBokDEvm3T\",\n    \"enc_user_id\": \"547353dbb6dca0423bb4e67ba9bdfff3\",\n    \"idp_access_token\": \"Bearer eyJhbGciOiJFUzI1NiIsImtpZCI6IjE3MTEwMDc3MzE2OTIiLCJ0eXAiOiJKV1QifQ.eyJleHAiOjE3MTM4NjA0MTEsImlhdCI6MTcxMzg1ODYxMSwiaXNzIjoiY29tbWVyY2VjbG91ZC9wcm9kdWN0aW9uL2JmaHEtMDA3LWJlM2UyN2E0LTQwYjEtNDkxMy05YjE1LTU2ZDdhNWQ3OWIzMiIsInNjb3BlIjpbXSwic3ViIjoie1wiQ3VzdG9tZXJJbmZvXCI6e1wiY3VzdG9tZXJJZFwiOlwiYWJIZkQ0RXBRaWpTZ2pFdWlCb2tERXZtM1RcIixcImd1ZXN0XCI6ZmFsc2UsXCJ2aXNpdElkXCI6XCI2Mjk4NGU3ZDBhMDFjN2ZhZGM1N2U0OWIwZlwifX0ifQ.ZYmW-OeRUQHyPIH0-zSohpdpw92iLuNz5vPxPsaZVa-Aduh_NS66Ksc8raldMzb2c9pRNGZn5GhiYbyAcIx93Q\",\n    \"idp_refresh_token\": \"\"\n}"
+										}
+									]
+								},
+								{
+									"name": "SLAS - Public Client - Ecom User - Get Refresh Access Token",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"var jsonBody= pm.response.json();",
+													"pm.collectionVariables.set(\"accessToken\", jsonBody.access_token);",
+													"pm.collectionVariables.set(\"b2cPublicRefreshToken\", jsonBody.refresh_token);",
+													"pm.collectionVariables.set(\"customerID\", jsonBody.customer_id);",
+													"pm.collectionVariables.set(\"usid\", jsonBody.usid);"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "noauth"
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/x-www-form-urlencoded"
+											}
+										],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "refresh_token",
+													"value": "{{b2cPublicRefreshToken}}",
+													"type": "text"
+												},
+												{
+													"key": "grant_type",
+													"value": "refresh_token",
+													"type": "text"
+												},
+												{
+													"key": "client_id",
+													"value": "{{slasPublicClientId}}",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "https://{{shortCode}}.api.commercecloud.salesforce.com/shopper/auth/v1/organizations/{{organizationId}}/oauth2/token",
+											"protocol": "https",
+											"host": [
+												"{{shortCode}}",
+												"api",
+												"commercecloud",
+												"salesforce",
+												"com"
+											],
+											"path": [
+												"shopper",
+												"auth",
+												"v1",
+												"organizations",
+												"{{organizationId}}",
+												"oauth2",
+												"token"
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "200 OK",
+											"originalRequest": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/x-www-form-urlencoded"
+													}
+												],
+												"body": {
+													"mode": "urlencoded",
+													"urlencoded": [
+														{
+															"key": "refresh_token",
+															"value": "{{b2cPublicRefreshToken}}",
+															"type": "text"
+														},
+														{
+															"key": "grant_type",
+															"value": "refresh_token",
+															"type": "text"
+														},
+														{
+															"key": "client_id",
+															"value": "{{slasPublicClientId}}",
+															"type": "text"
+														}
+													]
+												},
+												"url": {
+													"raw": "https://{{shortCode}}.api.commercecloud.salesforce.com/shopper/auth/v1/organizations/{{organizationId}}/oauth2/token",
+													"protocol": "https",
+													"host": [
+														"{{shortCode}}",
+														"api",
+														"commercecloud",
+														"salesforce",
+														"com"
+													],
+													"path": [
+														"shopper",
+														"auth",
+														"v1",
+														"organizations",
+														"{{organizationId}}",
+														"oauth2",
+														"token"
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Date",
+													"value": "Tue, 23 Apr 2024 08:07:39 GMT"
+												},
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												},
+												{
+													"key": "Transfer-Encoding",
+													"value": "chunked"
+												},
+												{
+													"key": "Connection",
+													"value": "keep-alive"
+												},
+												{
+													"key": "CF-Ray",
+													"value": "878c5c78bafa669b-MAD"
+												},
+												{
+													"key": "CF-Cache-Status",
+													"value": "DYNAMIC"
+												},
+												{
+													"key": "Cache-Control",
+													"value": "no-store"
+												},
+												{
+													"key": "Content-Encoding",
+													"value": "gzip"
+												},
+												{
+													"key": "Strict-Transport-Security",
+													"value": "max-age=31536000; includeSubDomains"
+												},
+												{
+													"key": "Vary",
+													"value": "Accept-Encoding, User-Agent"
+												},
+												{
+													"key": "pragma",
+													"value": "no-cache"
+												},
+												{
+													"key": "x-correlation-id",
+													"value": "878c5c78bafa669b"
+												},
+												{
+													"key": "x-ratelimit-1m-limit",
+													"value": "500"
+												},
+												{
+													"key": "x-ratelimit-1m-limit",
+													"value": "850000"
+												},
+												{
+													"key": "x-ratelimit-1m-remaining",
+													"value": "494"
+												},
+												{
+													"key": "x-ratelimit-1m-remaining",
+													"value": "812489"
+												},
+												{
+													"key": "x-ratelimit-1m-reset",
+													"value": "20322"
+												},
+												{
+													"key": "x-ratelimit-1m-reset",
+													"value": "20321"
+												},
+												{
+													"key": "Server",
+													"value": "cloudflare"
+												}
+											],
+											"cookie": [],
+											"body": "{\n    \"access_token\": \"eyJ2ZXIiOiIxLjAiLCJqa3UiOiJzbGFzL3Byb2QvYmZocV8wMDciLCJraWQiOiI1MDk2NGIzYi03ZDU3LTQ0MDItOTJmZS0zMGQzMzIyYTRmNTMiLCJ0eXAiOiJqd3QiLCJjbHYiOiJKMi4zLjQiLCJhbGciOiJFUzI1NiJ9.eyJhdXQiOiJHVUlEIiwic2NwIjoic2ZjYy5zaG9wcGVyLW15YWNjb3VudC5iYXNrZXRzIHNmY2Muc2hvcHBlci1kaXNjb3Zlcnktc2VhcmNoIHNmY2Muc2hvcHBlci1teWFjY291bnQuYWRkcmVzc2VzIHNmY2Muc2hvcHBlci1wcm9kdWN0cyBzZmNjLnNob3BwZXItbXlhY2NvdW50LnJ3IHNmY2Muc2hvcHBlci1teWFjY291bnQucGF5bWVudGluc3RydW1lbnRzIHNmY2Muc2hvcHBlci1jdXN0b21lcnMubG9naW4gc2ZjYy5zaG9wcGVyLXN0b3JlcyBjX2hlbGxvV29ybGRfciBzZmNjLnNob3BwZXItbXlhY2NvdW50Lm9yZGVycyBzZmNjLnNob3BwZXItYmFza2V0cy1vcmRlcnMgc2ZjYy5zaG9wcGVyLWN1c3RvbWVycy5yZWdpc3RlciBzZmNjLnNob3BwZXItbXlhY2NvdW50LmFkZHJlc3Nlcy5ydyBzZmNjLnNob3BwZXItbXlhY2NvdW50LnByb2R1Y3RsaXN0cy5ydyBzZmNjLnNob3BwZXItcHJvZHVjdGxpc3RzIHNmY2Muc2hvcHBlci1wcm9tb3Rpb25zIHNmY2Muc2hvcHBlci1iYXNrZXRzLW9yZGVycy5ydyBzZmNjLnNob3BwZXItZ2lmdC1jZXJ0aWZpY2F0ZXMgc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5wYXltZW50aW5zdHJ1bWVudHMucncgc2ZjYy5zaG9wcGVyLXByb2R1Y3Qtc2VhcmNoIHNmY2Muc2hvcHBlci1teWFjY291bnQucHJvZHVjdGxpc3RzIHNmY2Muc2hvcHBlci1jYXRlZ29yaWVzIHNmY2Muc2hvcHBlci1teWFjY291bnQiLCJzdWIiOiJjYy1zbGFzOjpiZmhxXzAwNzo6c2NpZDo2MDFlMjZkZi0wZjQwLTRkNTMtOWQ1ZC0xZjQxY2Q5OGE0ZDc6OnVzaWQ6ODFlYjQ5MjgtMjQ3Mi00ZjYyLWI2MGYtMWI2Mzk3M2VlYzgzIiwiY3R4Ijoic2xhcyIsImlzcyI6InNsYXMvcHJvZC9iZmhxXzAwNyIsImlzdCI6MSwiZG50IjoiMCIsImF1ZCI6ImNvbW1lcmNlY2xvdWQvcHJvZC9iZmhxXzAwNyIsIm5iZiI6MTcxMzg1OTYyOSwic3R5IjoiVXNlciIsImlzYiI6InVpZG86ZWNvbTo6dXBuOml2YW4ubW9sbC1tb2xsQGNhcGdlbWluaS5jb206OnVpZG46bnVsbCBNb2xsOjpnY2lkOmFibWJkSndIbzNrSEVSa0hvMWtHWVl4SHdXOjpyY2lkOmFiSGZENEVwUWlqU2dqRXVpQm9rREV2bTNUOjpjaGlkOlJlZkFyY2giLCJleHAiOjE3MTM4NjE0NTksImlhdCI6MTcxMzg1OTY1OSwianRpIjoiQzJDNzYxNTA3ODk3MC0xNjE0NzkxMTkyNTIxNjY4NzgyNDYxNjA3NyJ9.TQIM8z1aVp55rrVFbf0XCzcs-Eo9H9lR_8Vcb8nGHzjWJl0FfsAT3V9vNTk3ArtUOEkUqTG5mDQtFI-j6Gk7kw\",\n    \"id_token\": \"eyJraWQiOiI5YTA5ZjFkYi0yNmYyLTQ4MjAtYWYyMi0zMjRkZTdmYjBkZTQiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJjYy1zbGFzOjpiZmhxXzAwNzo6c2NpZDo2MDFlMjZkZi0wZjQwLTRkNTMtOWQ1ZC0xZjQxY2Q5OGE0ZDc6OnVzaWQ6ODFlYjQ5MjgtMjQ3Mi00ZjYyLWI2MGYtMWI2Mzk3M2VlYzgzIiwiYXVkIjoiNjAxZTI2ZGYtMGY0MC00ZDUzLTlkNWQtMWY0MWNkOThhNGQ3IiwiaXNzIjoicHJkLnVzLnNob3BwZXIuY2Muc2FsZXNmb3JjZS5jb20iLCJuYW1lIjoiZWNvbSIsImV4cCI6MTcxMzg2MTQ1OSwiaWF0IjoxNzEzODU5NjU5LCJlbWFpbCI6ImVjb20ifQ.CZkety0my-p3ymOT0ZJlSJ2wFOdOfl0kph2o-2aD-H_oWAezO9F5Nj6iWPI6TGuPyzy9OXW0ITDTJDINYVIKOaNcGvBOf0rtn_r6tusbR5hNQjEERI_ygNiGV-ImkuTOqNBy9Bb2xOwt3tRAOFyZkLR3teD-Az09wv1-b91vIXMM-L2YpskVajoqoNJiPJ2NbvAGVBmqOn3A8G0Ein5B7WIhylCzh-lI8OV9xfdAqM-cHJCrNRfnmw836ZIyKVcz4oS2OxBknyNbyWVhP-_hXkZXgNymXsdxc04yeG2Nwf9X5qbFeT8amn2QTktgxg9WYEKEsvPQ2kWB_zAGKoPI7Q\",\n    \"refresh_token\": \"-pErDl70XMQXitmxngidZ4GvHU_zbibM6Q3xGq5Z06o\",\n    \"expires_in\": 1800,\n    \"refresh_token_expires_in\": 7776000,\n    \"token_type\": \"BEARER\",\n    \"usid\": \"81eb4928-2472-4f62-b60f-1b63973eec83\",\n    \"customer_id\": \"abHfD4EpQijSgjEuiBokDEvm3T\",\n    \"enc_user_id\": \"547353dbb6dca0423bb4e67ba9bdfff3\",\n    \"idp_access_token\": \"eyJhbGciOiJFUzI1NiIsImtpZCI6IjE3MTEwMDc3MzE2OTIiLCJ0eXAiOiJKV1QifQ.eyJleHAiOjE3MTM4NjE0NDksImlhdCI6MTcxMzg1OTY0OSwiaXNzIjoiY29tbWVyY2VjbG91ZC9wcm9kdWN0aW9uL2JmaHEtMDA3LWJlM2UyN2E0LTQwYjEtNDkxMy05YjE1LTU2ZDdhNWQ3OWIzMiIsInNjb3BlIjpbXSwic3ViIjoie1wiQ3VzdG9tZXJJbmZvXCI6e1wiY3VzdG9tZXJJZFwiOlwiYWJIZkQ0RXBRaWpTZ2pFdWlCb2tERXZtM1RcIixcImd1ZXN0XCI6ZmFsc2UsXCJ2aXNpdElkXCI6XCIyMmRmNGYyZTE2ZjBjNzkzMWQyZGFhMTg2OFwifX0ifQ.CsDtJe3FqJPuUfuJsPE6NhTtEAo1FSTFgLsNJrEa2iHnfqc1BJYN2RV7MvbHqBEroZUQpgKDgDacgQL5U8oJkA\",\n    \"idp_refresh_token\": \"\"\n}"
+										}
+									]
+								}
+							],
+							"description": "- Single-page web app (for example, a PWA Kit storefront)\n    \n- Mobile app (Android or iOS)"
+						},
+						{
+							"name": "Guest User • Private Client",
+							"item": [
+								{
+									"name": "SLAS - Private Client - Guest - Access Token",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"var jsonBody= pm.response.json();",
+													"pm.collectionVariables.set(\"accessToken\", jsonBody.access_token);",
+													"pm.collectionVariables.set(\"guestPrivateRefreshToken\", jsonBody.refresh_token);",
+													"pm.collectionVariables.set(\"customerID\", jsonBody.customer_id);",
+													"pm.collectionVariables.set(\"usid\", jsonBody.usid);"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "basic",
+											"basic": [
+												{
+													"key": "password",
+													"value": "{{slasPrivatePassword}}",
+													"type": "string"
+												},
+												{
+													"key": "username",
+													"value": "{{slasPrivateClientId}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/x-www-form-urlencoded"
+											}
+										],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "grant_type",
+													"value": "client_credentials",
+													"type": "text"
+												},
+												{
+													"key": "redirect_uri",
+													"value": "{{slasRedirectUri}}",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "https://{{shortCode}}.api.commercecloud.salesforce.com/shopper/auth/v1/organizations/{{organizationId}}/oauth2/token",
+											"protocol": "https",
+											"host": [
+												"{{shortCode}}",
+												"api",
+												"commercecloud",
+												"salesforce",
+												"com"
+											],
+											"path": [
+												"shopper",
+												"auth",
+												"v1",
+												"organizations",
+												"{{organizationId}}",
+												"oauth2",
+												"token"
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "200 OK",
+											"originalRequest": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/x-www-form-urlencoded"
+													}
+												],
+												"body": {
+													"mode": "urlencoded",
+													"urlencoded": [
+														{
+															"key": "grant_type",
+															"value": "client_credentials",
+															"type": "text"
+														},
+														{
+															"key": "redirect_uri",
+															"value": "{{slasRedirectUri}}",
+															"type": "text"
+														}
+													]
+												},
+												"url": {
+													"raw": "https://{{shortCode}}.api.commercecloud.salesforce.com/shopper/auth/v1/organizations/{{organizationId}}/oauth2/token",
+													"protocol": "https",
+													"host": [
+														"{{shortCode}}",
+														"api",
+														"commercecloud",
+														"salesforce",
+														"com"
+													],
+													"path": [
+														"shopper",
+														"auth",
+														"v1",
+														"organizations",
+														"{{organizationId}}",
+														"oauth2",
+														"token"
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Date",
+													"value": "Tue, 23 Apr 2024 08:46:55 GMT"
+												},
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												},
+												{
+													"key": "Transfer-Encoding",
+													"value": "chunked"
+												},
+												{
+													"key": "Connection",
+													"value": "keep-alive"
+												},
+												{
+													"key": "CF-Ray",
+													"value": "878c95fa9bfb217a-MAD"
+												},
+												{
+													"key": "CF-Cache-Status",
+													"value": "DYNAMIC"
+												},
+												{
+													"key": "Cache-Control",
+													"value": "no-store"
+												},
+												{
+													"key": "Content-Encoding",
+													"value": "gzip"
+												},
+												{
+													"key": "Strict-Transport-Security",
+													"value": "max-age=31536000; includeSubDomains"
+												},
+												{
+													"key": "Vary",
+													"value": "Accept-Encoding, User-Agent"
+												},
+												{
+													"key": "pragma",
+													"value": "no-cache"
+												},
+												{
+													"key": "x-correlation-id",
+													"value": "878c95fa9bfb217a"
+												},
+												{
+													"key": "x-ratelimit-1m-limit",
+													"value": "500"
+												},
+												{
+													"key": "x-ratelimit-1m-limit",
+													"value": "850000"
+												},
+												{
+													"key": "x-ratelimit-1m-remaining",
+													"value": "499"
+												},
+												{
+													"key": "x-ratelimit-1m-remaining",
+													"value": "801141"
+												},
+												{
+													"key": "x-ratelimit-1m-reset",
+													"value": "4764"
+												},
+												{
+													"key": "x-ratelimit-1m-reset",
+													"value": "4763"
+												},
+												{
+													"key": "Server",
+													"value": "cloudflare"
+												}
+											],
+											"cookie": [],
+											"body": "{\n    \"access_token\": \"eyJ2ZXIiOiIxLjAiLCJqa3UiOiJzbGFzL3Byb2QvYmZocV8wMDciLCJraWQiOiI1MDk2NGIzYi03ZDU3LTQ0MDItOTJmZS0zMGQzMzIyYTRmNTMiLCJ0eXAiOiJqd3QiLCJjbHYiOiJKMi4zLjQiLCJhbGciOiJFUzI1NiJ9.eyJhdXQiOiJHVUlEIiwic2NwIjoic2ZjYy5zaG9wcGVyLW15YWNjb3VudC5iYXNrZXRzIHNmY2Muc2hvcHBlci1kaXNjb3Zlcnktc2VhcmNoIHNmY2Muc2hvcHBlci1teWFjY291bnQuYWRkcmVzc2VzIHNmY2Muc2hvcHBlci1wcm9kdWN0cyBzZmNjLnNob3BwZXItbXlhY2NvdW50LnJ3IHNmY2Muc2hvcHBlci1teWFjY291bnQucGF5bWVudGluc3RydW1lbnRzIHNmY2Muc2hvcHBlci1jdXN0b21lcnMubG9naW4gc2ZjYy5zaG9wcGVyLXN0b3JlcyBzZmNjLnNob3BwZXItbXlhY2NvdW50Lm9yZGVycyBzZmNjLnNob3BwZXItYmFza2V0cy1vcmRlcnMgc2ZjYy5zaG9wcGVyLWN1c3RvbWVycy5yZWdpc3RlciBzZmNjLnNob3BwZXItbXlhY2NvdW50LmFkZHJlc3Nlcy5ydyBzZmNjLnNob3BwZXItbXlhY2NvdW50LnByb2R1Y3RsaXN0cy5ydyBzZmNjLnNob3BwZXItcHJvZHVjdGxpc3RzIHNmY2Muc2hvcHBlci1wcm9tb3Rpb25zIHNmY2Muc2hvcHBlci1iYXNrZXRzLW9yZGVycy5ydyBzZmNjLnNob3BwZXItZ2lmdC1jZXJ0aWZpY2F0ZXMgc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5wYXltZW50aW5zdHJ1bWVudHMucncgY19oZWxsb1dvcmxkX3J3IHNmY2Muc2hvcHBlci1wcm9kdWN0LXNlYXJjaCBzZmNjLnNob3BwZXItbXlhY2NvdW50LnByb2R1Y3RsaXN0cyBzZmNjLnNob3BwZXItY2F0ZWdvcmllcyBzZmNjLnNob3BwZXItbXlhY2NvdW50Iiwic3ViIjoiY2Mtc2xhczo6YmZocV8wMDc6OnNjaWQ6NmZkMWFjYmEtZmQ3NS00NWRiLTg5NTYtZDBkYWQ5MWQzODk0Ojp1c2lkOjViOTVlNzRkLWE2NTktNGYyYy05Njc4LTg0MWIxZWFlNjliOSIsImN0eCI6InNsYXMiLCJpc3MiOiJzbGFzL3Byb2QvYmZocV8wMDciLCJpc3QiOjEsImRudCI6IjAiLCJhdWQiOiJjb21tZXJjZWNsb3VkL3Byb2QvYmZocV8wMDciLCJuYmYiOjE3MTM4NjE5ODUsInN0eSI6IlVzZXIiLCJpc2IiOiJ1aWRvOnNsYXM6OnVwbjpHdWVzdDo6dWlkbjpHdWVzdCBVc2VyOjpnY2lkOmFibHVnM2x1czFsZW9Sd3J3Wm1xWVl4SGhIOjpjaGlkOiAiLCJleHAiOjE3MTM4NjM4MTUsImlhdCI6MTcxMzg2MjAxNSwianRpIjoiQzJDNzYxNTA3ODk3MC0xNjE0NzkxMTkyNTIxODk1MzM3NzUzODQzOCJ9.ksF6shVWKdvqMFaJqFaJBCWNPvq6mFbIwXSe8aSvBFrrbUVjV1DVN-enyCxQIhjBmYg7eshIjiatavPnKTzUdQ\",\n    \"id_token\": \"\",\n    \"refresh_token\": \"KXi11bHOHXDI6N_VGp0BwwV9Opj3bVR7D_CgL7xxacc\",\n    \"expires_in\": 1800,\n    \"refresh_token_expires_in\": 2592000,\n    \"token_type\": \"BEARER\",\n    \"usid\": \"5b95e74d-a659-4f2c-9678-841b1eae69b9\",\n    \"customer_id\": \"ablug3lus1leoRwrwZmqYYxHhH\",\n    \"enc_user_id\": \"adb831a7fdd83dd1e2a309ce7591dff8\",\n    \"idp_access_token\": \"\",\n    \"idp_refresh_token\": \"\"\n}"
+										}
+									]
+								},
+								{
+									"name": "SLAS - Private Client - Guest - Get Refresh Guest Access Token",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"var jsonBody= pm.response.json();",
+													"pm.collectionVariables.set(\"accessToken\", jsonBody.access_token);",
+													"pm.collectionVariables.set(\"guestPrivateRefreshToken\", jsonBody.refresh_token);",
+													"pm.collectionVariables.set(\"customerID\", jsonBody.customer_id);",
+													"pm.collectionVariables.set(\"usid\", jsonBody.usid);"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "basic",
+											"basic": [
+												{
+													"key": "password",
+													"value": "{{slasPrivatePassword}}",
+													"type": "string"
+												},
+												{
+													"key": "username",
+													"value": "{{slasPrivateClientId}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/x-www-form-urlencoded"
+											}
+										],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "refresh_token",
+													"value": "{{guestPrivateRefreshToken}}",
+													"type": "text"
+												},
+												{
+													"key": "grant_type",
+													"value": "refresh_token",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "https://{{shortCode}}.api.commercecloud.salesforce.com/shopper/auth/v1/organizations/{{organizationId}}/oauth2/token",
+											"protocol": "https",
+											"host": [
+												"{{shortCode}}",
+												"api",
+												"commercecloud",
+												"salesforce",
+												"com"
+											],
+											"path": [
+												"shopper",
+												"auth",
+												"v1",
+												"organizations",
+												"{{organizationId}}",
+												"oauth2",
+												"token"
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "200 OK",
+											"originalRequest": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/x-www-form-urlencoded"
+													}
+												],
+												"body": {
+													"mode": "urlencoded",
+													"urlencoded": [
+														{
+															"key": "refresh_token",
+															"value": "{{guestPrivateRefreshToken}}",
+															"type": "text"
+														},
+														{
+															"key": "grant_type",
+															"value": "refresh_token",
+															"type": "text"
+														}
+													]
+												},
+												"url": {
+													"raw": "https://{{shortCode}}.api.commercecloud.salesforce.com/shopper/auth/v1/organizations/{{organizationId}}/oauth2/token",
+													"protocol": "https",
+													"host": [
+														"{{shortCode}}",
+														"api",
+														"commercecloud",
+														"salesforce",
+														"com"
+													],
+													"path": [
+														"shopper",
+														"auth",
+														"v1",
+														"organizations",
+														"{{organizationId}}",
+														"oauth2",
+														"token"
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Date",
+													"value": "Tue, 23 Apr 2024 08:46:58 GMT"
+												},
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												},
+												{
+													"key": "Transfer-Encoding",
+													"value": "chunked"
+												},
+												{
+													"key": "Connection",
+													"value": "keep-alive"
+												},
+												{
+													"key": "CF-Ray",
+													"value": "878c960f1c43217a-MAD"
+												},
+												{
+													"key": "CF-Cache-Status",
+													"value": "DYNAMIC"
+												},
+												{
+													"key": "Cache-Control",
+													"value": "no-store"
+												},
+												{
+													"key": "Content-Encoding",
+													"value": "gzip"
+												},
+												{
+													"key": "Strict-Transport-Security",
+													"value": "max-age=31536000; includeSubDomains"
+												},
+												{
+													"key": "Vary",
+													"value": "Accept-Encoding, User-Agent"
+												},
+												{
+													"key": "pragma",
+													"value": "no-cache"
+												},
+												{
+													"key": "x-correlation-id",
+													"value": "878c960f1c43217a"
+												},
+												{
+													"key": "x-ratelimit-1m-limit",
+													"value": "500"
+												},
+												{
+													"key": "x-ratelimit-1m-limit",
+													"value": "850000"
+												},
+												{
+													"key": "x-ratelimit-1m-remaining",
+													"value": "498"
+												},
+												{
+													"key": "x-ratelimit-1m-remaining",
+													"value": "798384"
+												},
+												{
+													"key": "x-ratelimit-1m-reset",
+													"value": "1546"
+												},
+												{
+													"key": "x-ratelimit-1m-reset",
+													"value": "1545"
+												},
+												{
+													"key": "Server",
+													"value": "cloudflare"
+												}
+											],
+											"cookie": [],
+											"body": "{\n    \"access_token\": \"eyJ2ZXIiOiIxLjAiLCJqa3UiOiJzbGFzL3Byb2QvYmZocV8wMDciLCJraWQiOiI1MDk2NGIzYi03ZDU3LTQ0MDItOTJmZS0zMGQzMzIyYTRmNTMiLCJ0eXAiOiJqd3QiLCJjbHYiOiJKMi4zLjQiLCJhbGciOiJFUzI1NiJ9.eyJhdXQiOiJHVUlEIiwic2NwIjoic2ZjYy5zaG9wcGVyLW15YWNjb3VudC5iYXNrZXRzIHNmY2Muc2hvcHBlci1kaXNjb3Zlcnktc2VhcmNoIHNmY2Muc2hvcHBlci1teWFjY291bnQuYWRkcmVzc2VzIHNmY2Muc2hvcHBlci1wcm9kdWN0cyBzZmNjLnNob3BwZXItbXlhY2NvdW50LnJ3IHNmY2Muc2hvcHBlci1teWFjY291bnQucGF5bWVudGluc3RydW1lbnRzIHNmY2Muc2hvcHBlci1jdXN0b21lcnMubG9naW4gc2ZjYy5zaG9wcGVyLXN0b3JlcyBzZmNjLnNob3BwZXItbXlhY2NvdW50Lm9yZGVycyBzZmNjLnNob3BwZXItYmFza2V0cy1vcmRlcnMgc2ZjYy5zaG9wcGVyLWN1c3RvbWVycy5yZWdpc3RlciBzZmNjLnNob3BwZXItbXlhY2NvdW50LmFkZHJlc3Nlcy5ydyBzZmNjLnNob3BwZXItbXlhY2NvdW50LnByb2R1Y3RsaXN0cy5ydyBzZmNjLnNob3BwZXItcHJvZHVjdGxpc3RzIHNmY2Muc2hvcHBlci1wcm9tb3Rpb25zIHNmY2Muc2hvcHBlci1iYXNrZXRzLW9yZGVycy5ydyBzZmNjLnNob3BwZXItZ2lmdC1jZXJ0aWZpY2F0ZXMgc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5wYXltZW50aW5zdHJ1bWVudHMucncgY19oZWxsb1dvcmxkX3J3IHNmY2Muc2hvcHBlci1wcm9kdWN0LXNlYXJjaCBzZmNjLnNob3BwZXItbXlhY2NvdW50LnByb2R1Y3RsaXN0cyBzZmNjLnNob3BwZXItY2F0ZWdvcmllcyBzZmNjLnNob3BwZXItbXlhY2NvdW50Iiwic3ViIjoiY2Mtc2xhczo6YmZocV8wMDc6OnNjaWQ6NmZkMWFjYmEtZmQ3NS00NWRiLTg5NTYtZDBkYWQ5MWQzODk0Ojp1c2lkOjViOTVlNzRkLWE2NTktNGYyYy05Njc4LTg0MWIxZWFlNjliOSIsImN0eCI6InNsYXMiLCJpc3MiOiJzbGFzL3Byb2QvYmZocV8wMDciLCJpc3QiOjEsImRudCI6IjAiLCJhdWQiOiJjb21tZXJjZWNsb3VkL3Byb2QvYmZocV8wMDciLCJuYmYiOjE3MTM4NjE5ODgsInN0eSI6IlVzZXIiLCJpc2IiOiJ1aWRvOnNsYXM6OnVwbjpHdWVzdDo6dWlkbjpHdWVzdCBVc2VyOjpnY2lkOmFibHVnM2x1czFsZW9Sd3J3Wm1xWVl4SGhIOjpjaGlkOiAiLCJleHAiOjE3MTM4NjM4MTgsImlhdCI6MTcxMzg2MjAxOCwianRpIjoiQzJDNzYxNTA3ODk3MC0xNjE0NzkxMTkyNTIxOTA0NjYxNzM4OTY0NyJ9.-N2E5QW22TCgE4IUKVKXutuX7G3teaCLnU9bSojRqohaBNGUS-PaA9qQlNvZ6x40HiSKP7z8tnKc0L0qcuC_Qg\",\n    \"id_token\": \"\",\n    \"refresh_token\": \"KXi11bHOHXDI6N_VGp0BwwV9Opj3bVR7D_CgL7xxacc\",\n    \"expires_in\": 1800,\n    \"refresh_token_expires_in\": 2592000,\n    \"token_type\": \"BEARER\",\n    \"usid\": \"5b95e74d-a659-4f2c-9678-841b1eae69b9\",\n    \"customer_id\": \"ablug3lus1leoRwrwZmqYYxHhH\",\n    \"enc_user_id\": \"adb831a7fdd83dd1e2a309ce7591dff8\",\n    \"idp_access_token\": null,\n    \"idp_refresh_token\": \"\"\n}"
+										}
+									]
+								}
+							],
+							"description": "- Traditional full stack web app\n- Any kind of app with a backend-for-frontend (BFF)"
+						},
+						{
+							"name": "Ecom User • Private Client",
+							"item": [
+								{
+									"name": "SLAS - Private Client - Ecom User - Authorize",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"function generateCodeVerifier() {",
+													"    return generateRandomString(96);",
+													"}",
+													"",
+													"function generateRandomString(length) {",
+													"    var text = \"\";",
+													"    var possible = \"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\";",
+													"    for (var i = 0; i < length; i++) {",
+													"        text += possible.charAt(Math.floor(Math.random() * possible.length));",
+													"    }",
+													"    return text;",
+													"}",
+													"",
+													"function generateCodeChallenge(code_verifier) {",
+													"    return CryptoJS.SHA256(code_verifier);",
+													"}",
+													"",
+													"function base64URL(string) {",
+													"    return string.toString(CryptoJS.enc.Base64).replace(/=/g, '').replace(/\\+/g, '-').replace(/\\//g, '_')",
+													"}",
+													"",
+													"var verifier = base64URL(generateCodeVerifier());",
+													"var challenge = base64URL(generateCodeChallenge(verifier));",
+													"",
+													"pm.collectionVariables.set(\"ECOM_USER_CODE_VERIFIER\", verifier);",
+													"pm.collectionVariables.set(\"ECOM_USER_CODE_CHALLENGE\", challenge);"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"let code = null;",
+													"let usid = null;",
+													"",
+													"pm.test(\"Status code is 303\", function () {",
+													"    pm.response.to.have.status(303);",
+													"    let location = pm.response.headers.get(\"Location\").split('?');",
+													"    let params = location[1].split('&');",
+													"    code = params.pop().substring(5);",
+													"    usid = params[0].substring(5);",
+													"});",
+													"",
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"    var jsonBody = pm.response.json();",
+													"    code = jsonBody.code || jsonBody.authCode;",
+													"    usid = jsonBody.usid;",
+													"});",
+													"",
+													"console.log(`code is ${code}`);",
+													"console.log(`usid is ${usid}`);",
+													"if (code) pm.collectionVariables.set(\"authCode\", code);",
+													"if (usid) pm.collectionVariables.set(\"usid\", usid);",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"followRedirects": false
+									},
+									"request": {
+										"auth": {
+											"type": "basic",
+											"basic": [
+												{
+													"key": "password",
+													"value": "{{shopperPassword}}",
+													"type": "string"
+												},
+												{
+													"key": "username",
+													"value": "{{shopperUserID}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/x-www-form-urlencoded"
+											}
+										],
+										"url": {
+											"raw": "https://{{shortCode}}.api.commercecloud.salesforce.com/shopper/auth/v1/organizations/{{organizationId}}/oauth2/login?client_id={{slasPrivateClientId}}&channel_id={{siteID}}&redirect_uri={{slasRedirectUri}}&code_challenge={{ECOM_USER_CODE_CHALLENGE}}",
+											"protocol": "https",
+											"host": [
+												"{{shortCode}}",
+												"api",
+												"commercecloud",
+												"salesforce",
+												"com"
+											],
+											"path": [
+												"shopper",
+												"auth",
+												"v1",
+												"organizations",
+												"{{organizationId}}",
+												"oauth2",
+												"login"
+											],
+											"query": [
+												{
+													"key": "client_id",
+													"value": "{{slasPrivateClientId}}"
+												},
+												{
+													"key": "channel_id",
+													"value": "{{siteID}}"
+												},
+												{
+													"key": "redirect_uri",
+													"value": "{{slasRedirectUri}}"
+												},
+												{
+													"key": "code_challenge",
+													"value": "{{ECOM_USER_CODE_CHALLENGE}}"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "303 See Other",
+											"originalRequest": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/x-www-form-urlencoded"
+													}
+												],
+												"url": {
+													"raw": "https://{{shortCode}}.api.commercecloud.salesforce.com/shopper/auth/v1/organizations/{{organizationId}}/oauth2/login?client_id={{slasPrivateClientId}}&channel_id={{siteID}}&redirect_uri={{slasRedirectUri}}&code_challenge={{ECOM_USER_CODE_CHALLENGE}}",
+													"protocol": "https",
+													"host": [
+														"{{shortCode}}",
+														"api",
+														"commercecloud",
+														"salesforce",
+														"com"
+													],
+													"path": [
+														"shopper",
+														"auth",
+														"v1",
+														"organizations",
+														"{{organizationId}}",
+														"oauth2",
+														"login"
+													],
+													"query": [
+														{
+															"key": "client_id",
+															"value": "{{slasPrivateClientId}}"
+														},
+														{
+															"key": "channel_id",
+															"value": "{{siteID}}"
+														},
+														{
+															"key": "redirect_uri",
+															"value": "{{slasRedirectUri}}"
+														},
+														{
+															"key": "code_challenge",
+															"value": "{{ECOM_USER_CODE_CHALLENGE}}"
+														}
+													]
+												}
+											},
+											"status": "See Other",
+											"code": 303,
+											"_postman_previewlanguage": "plain",
+											"header": [
+												{
+													"key": "Date",
+													"value": "Tue, 23 Apr 2024 08:21:42 GMT"
+												},
+												{
+													"key": "Content-Length",
+													"value": "0"
+												},
+												{
+													"key": "Connection",
+													"value": "keep-alive"
+												},
+												{
+													"key": "Location",
+													"value": "http://localhost:3000/callback?usid=91267b09-9423-4d56-b7e2-7c6186e55c0d&state=1713860502383&scope=openid%20offline_access&code=_nseXPgGu01qZjvvm0zS0cKfL1Xy5BJ-ru95Dl9jH2Q"
+												},
+												{
+													"key": "CF-Ray",
+													"value": "878c710959895cf6-MAD"
+												},
+												{
+													"key": "CF-Cache-Status",
+													"value": "DYNAMIC"
+												},
+												{
+													"key": "Cache-Control",
+													"value": "no-store"
+												},
+												{
+													"key": "Strict-Transport-Security",
+													"value": "max-age=31536000; includeSubDomains"
+												},
+												{
+													"key": "pragma",
+													"value": "no-cache"
+												},
+												{
+													"key": "x-correlation-id",
+													"value": "878c710959895cf6"
+												},
+												{
+													"key": "x-ratelimit-1m-limit",
+													"value": "500"
+												},
+												{
+													"key": "x-ratelimit-1m-limit",
+													"value": "850000"
+												},
+												{
+													"key": "x-ratelimit-1m-remaining",
+													"value": "499"
+												},
+												{
+													"key": "x-ratelimit-1m-remaining",
+													"value": "811402"
+												},
+												{
+													"key": "x-ratelimit-1m-reset",
+													"value": "17820"
+												},
+												{
+													"key": "x-ratelimit-1m-reset",
+													"value": "17818"
+												},
+												{
+													"key": "Vary",
+													"value": "Accept-Encoding"
+												},
+												{
+													"key": "Server",
+													"value": "cloudflare"
+												}
+											],
+											"cookie": [],
+											"body": null
+										}
+									]
+								},
+								{
+									"name": "SLAS - Private Client - Ecom User - Access Token",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"var jsonBody= pm.response.json();",
+													"pm.collectionVariables.set(\"accessToken\", jsonBody.access_token);",
+													"pm.collectionVariables.set(\"b2cPrivateRefreshToken\", jsonBody.refresh_token);",
+													"pm.collectionVariables.set(\"customerID\", jsonBody.customer_id);",
+													"pm.collectionVariables.set(\"usid\", jsonBody.usid);"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "basic",
+											"basic": [
+												{
+													"key": "password",
+													"value": "{{slasPrivatePassword}}",
+													"type": "string"
+												},
+												{
+													"key": "username",
+													"value": "{{slasPrivateClientId}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/x-www-form-urlencoded"
+											}
+										],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "code",
+													"value": "{{authCode}}",
+													"type": "text"
+												},
+												{
+													"key": "grant_type",
+													"value": "authorization_code_pkce",
+													"type": "text"
+												},
+												{
+													"key": "redirect_uri",
+													"value": "{{slasRedirectUri}}",
+													"type": "text"
+												},
+												{
+													"key": "code_verifier",
+													"value": "{{ECOM_USER_CODE_VERIFIER}}",
+													"type": "text"
+												},
+												{
+													"key": "channel_id",
+													"value": "{{siteID}}",
+													"type": "text"
+												},
+												{
+													"key": "usid",
+													"value": "{{usid}}",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "https://{{shortCode}}.api.commercecloud.salesforce.com/shopper/auth/v1/organizations/{{organizationId}}/oauth2/token",
+											"protocol": "https",
+											"host": [
+												"{{shortCode}}",
+												"api",
+												"commercecloud",
+												"salesforce",
+												"com"
+											],
+											"path": [
+												"shopper",
+												"auth",
+												"v1",
+												"organizations",
+												"{{organizationId}}",
+												"oauth2",
+												"token"
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "200 OK",
+											"originalRequest": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/x-www-form-urlencoded"
+													}
+												],
+												"body": {
+													"mode": "urlencoded",
+													"urlencoded": [
+														{
+															"key": "code",
+															"value": "{{authCode}}",
+															"type": "text"
+														},
+														{
+															"key": "grant_type",
+															"value": "authorization_code_pkce",
+															"type": "text"
+														},
+														{
+															"key": "redirect_uri",
+															"value": "{{slasRedirectUri}}",
+															"type": "text"
+														},
+														{
+															"key": "code_verifier",
+															"value": "{{ECOM_USER_CODE_VERIFIER}}",
+															"type": "text"
+														},
+														{
+															"key": "channel_id",
+															"value": "{{siteID}}",
+															"type": "text"
+														},
+														{
+															"key": "usid",
+															"value": "{{usid}}",
+															"type": "text"
+														}
+													]
+												},
+												"url": {
+													"raw": "https://{{shortCode}}.api.commercecloud.salesforce.com/shopper/auth/v1/organizations/{{organizationId}}/oauth2/token",
+													"protocol": "https",
+													"host": [
+														"{{shortCode}}",
+														"api",
+														"commercecloud",
+														"salesforce",
+														"com"
+													],
+													"path": [
+														"shopper",
+														"auth",
+														"v1",
+														"organizations",
+														"{{organizationId}}",
+														"oauth2",
+														"token"
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Date",
+													"value": "Tue, 23 Apr 2024 08:24:56 GMT"
+												},
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												},
+												{
+													"key": "Transfer-Encoding",
+													"value": "chunked"
+												},
+												{
+													"key": "Connection",
+													"value": "keep-alive"
+												},
+												{
+													"key": "CF-Ray",
+													"value": "878c75c5a97f5cf6-MAD"
+												},
+												{
+													"key": "CF-Cache-Status",
+													"value": "DYNAMIC"
+												},
+												{
+													"key": "Cache-Control",
+													"value": "no-store"
+												},
+												{
+													"key": "Content-Encoding",
+													"value": "gzip"
+												},
+												{
+													"key": "Strict-Transport-Security",
+													"value": "max-age=31536000; includeSubDomains"
+												},
+												{
+													"key": "Vary",
+													"value": "Accept-Encoding, User-Agent"
+												},
+												{
+													"key": "pragma",
+													"value": "no-cache"
+												},
+												{
+													"key": "x-correlation-id",
+													"value": "878c75c5a97f5cf6"
+												},
+												{
+													"key": "x-ratelimit-1m-limit",
+													"value": "500"
+												},
+												{
+													"key": "x-ratelimit-1m-limit",
+													"value": "850000"
+												},
+												{
+													"key": "x-ratelimit-1m-remaining",
+													"value": "499"
+												},
+												{
+													"key": "x-ratelimit-1m-remaining",
+													"value": "798922"
+												},
+												{
+													"key": "x-ratelimit-1m-reset",
+													"value": "3937"
+												},
+												{
+													"key": "x-ratelimit-1m-reset",
+													"value": "3935"
+												},
+												{
+													"key": "Server",
+													"value": "cloudflare"
+												}
+											],
+											"cookie": [],
+											"body": "{\n    \"access_token\": \"eyJ2ZXIiOiIxLjAiLCJqa3UiOiJzbGFzL3Byb2QvYmZocV8wMDciLCJraWQiOiI1MDk2NGIzYi03ZDU3LTQ0MDItOTJmZS0zMGQzMzIyYTRmNTMiLCJ0eXAiOiJqd3QiLCJjbHYiOiJKMi4zLjQiLCJhbGciOiJFUzI1NiJ9.eyJhdXQiOiJHVUlEIiwic2NwIjoic2ZjYy5zaG9wcGVyLW15YWNjb3VudC5iYXNrZXRzIHNmY2Muc2hvcHBlci1kaXNjb3Zlcnktc2VhcmNoIHNmY2Muc2hvcHBlci1teWFjY291bnQuYWRkcmVzc2VzIHNmY2Muc2hvcHBlci1wcm9kdWN0cyBzZmNjLnNob3BwZXItbXlhY2NvdW50LnJ3IHNmY2Muc2hvcHBlci1teWFjY291bnQucGF5bWVudGluc3RydW1lbnRzIHNmY2Muc2hvcHBlci1jdXN0b21lcnMubG9naW4gc2ZjYy5zaG9wcGVyLXN0b3JlcyBzZmNjLnNob3BwZXItbXlhY2NvdW50Lm9yZGVycyBzZmNjLnNob3BwZXItYmFza2V0cy1vcmRlcnMgc2ZjYy5zaG9wcGVyLWN1c3RvbWVycy5yZWdpc3RlciBzZmNjLnNob3BwZXItbXlhY2NvdW50LmFkZHJlc3Nlcy5ydyBzZmNjLnNob3BwZXItbXlhY2NvdW50LnByb2R1Y3RsaXN0cy5ydyBzZmNjLnNob3BwZXItcHJvZHVjdGxpc3RzIHNmY2Muc2hvcHBlci1wcm9tb3Rpb25zIHNmY2Muc2hvcHBlci1iYXNrZXRzLW9yZGVycy5ydyBzZmNjLnNob3BwZXItZ2lmdC1jZXJ0aWZpY2F0ZXMgc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5wYXltZW50aW5zdHJ1bWVudHMucncgY19oZWxsb1dvcmxkX3J3IHNmY2Muc2hvcHBlci1wcm9kdWN0LXNlYXJjaCBzZmNjLnNob3BwZXItbXlhY2NvdW50LnByb2R1Y3RsaXN0cyBzZmNjLnNob3BwZXItY2F0ZWdvcmllcyBzZmNjLnNob3BwZXItbXlhY2NvdW50Iiwic3ViIjoiY2Mtc2xhczo6YmZocV8wMDc6OnNjaWQ6NmZkMWFjYmEtZmQ3NS00NWRiLTg5NTYtZDBkYWQ5MWQzODk0Ojp1c2lkOjkxMjY3YjA5LTk0MjMtNGQ1Ni1iN2UyLTdjNjE4NmU1NWMwZCIsImN0eCI6InNsYXMiLCJpc3MiOiJzbGFzL3Byb2QvYmZocV8wMDciLCJpc3QiOjEsImRudCI6IjAiLCJhdWQiOiJjb21tZXJjZWNsb3VkL3Byb2QvYmZocV8wMDciLCJuYmYiOjE3MTM4NjA2NjYsInN0eSI6IlVzZXIiLCJpc2IiOiJ1aWRvOmVjb206OnVwbjppdmFuLm1vbGwtbW9sbEBjYXBnZW1pbmkuY29tOjp1aWRuOm51bGwgTW9sbDo6Z2NpZDphYm1yY1dsSEJHa2JJUm1yb1drV1lZeGJzMDo6cmNpZDphYkhmRDRFcFFpalNnakV1aUJva0RFdm0zVDo6Y2hpZDpSZWZBcmNoIiwiZXhwIjoxNzEzODYyNDk2LCJpYXQiOjE3MTM4NjA2OTYsImp0aSI6IkMyQzc2MTUwNzg5NzAtMTYxNDc5MTE5MjUyMTc4MjYyMzI2NTY3NTgifQ.MUJuNiITMX9gueyHr52ckfbVs1ZRnqCuGISkLYMuLzWT-MJpw9tTLEqOw3MCqTvAAaScrnpI-VUQXzZzP045IA\",\n    \"id_token\": \"eyJraWQiOiI5YTA5ZjFkYi0yNmYyLTQ4MjAtYWYyMi0zMjRkZTdmYjBkZTQiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJjYy1zbGFzOjpiZmhxXzAwNzo6c2NpZDo2ZmQxYWNiYS1mZDc1LTQ1ZGItODk1Ni1kMGRhZDkxZDM4OTQ6OnVzaWQ6OTEyNjdiMDktOTQyMy00ZDU2LWI3ZTItN2M2MTg2ZTU1YzBkIiwiYXVkIjoiNmZkMWFjYmEtZmQ3NS00NWRiLTg5NTYtZDBkYWQ5MWQzODk0IiwiaXNzIjoicHJkLnVzLnNob3BwZXIuY2Muc2FsZXNmb3JjZS5jb20iLCJuYW1lIjoiZWNvbSIsImV4cCI6MTcxMzg2MjQ5NiwiaWF0IjoxNzEzODYwNjk2LCJlbWFpbCI6ImVjb20ifQ.e3I3VjlJW6TCljIPcs3l661dXP8MP5Wyia0MHe-lgv5YDrvlBowyC-RvhiUvNv6EWHpQrn5Ki-ggUS3LsI92k2ggMSIJLKISJFsSEbZeyzpFJNGHtCCqwWR9BzROVIbCmJqpmV631c1gf6DHqbx89LNY9t77Dt3a-jEOA2le9pEOjPVgUeMBlEDrMosR3zmwKCMq3cjAuGxB5gx2UsjUWvS-aVRAPw9HRzG77aE7rTfTqr_79BEUeVXQjY11hlr2nDDK_Ecm2175uKY3m34dyxP0c-bsOXXGQweED5gT9_iFczLxA3Utqg-SIjGcw_CtYtXx6jAuvwZFEZt1TGGwRg\",\n    \"refresh_token\": \"CxrZgq5OypMaUzJWPzB09DgcH8S9e5cfKWKYbcGLdIo\",\n    \"expires_in\": 1800,\n    \"refresh_token_expires_in\": 7776000,\n    \"token_type\": \"BEARER\",\n    \"usid\": \"91267b09-9423-4d56-b7e2-7c6186e55c0d\",\n    \"customer_id\": \"abHfD4EpQijSgjEuiBokDEvm3T\",\n    \"enc_user_id\": \"547353dbb6dca0423bb4e67ba9bdfff3\",\n    \"idp_access_token\": \"Bearer eyJhbGciOiJFUzI1NiIsImtpZCI6IjE3MTEwMDc3MzE2OTIiLCJ0eXAiOiJKV1QifQ.eyJleHAiOjE3MTM4NjIzMDIsImlhdCI6MTcxMzg2MDUwMiwiaXNzIjoiY29tbWVyY2VjbG91ZC9wcm9kdWN0aW9uL2JmaHEtMDA3LWJlM2UyN2E0LTQwYjEtNDkxMy05YjE1LTU2ZDdhNWQ3OWIzMiIsInNjb3BlIjpbXSwic3ViIjoie1wiQ3VzdG9tZXJJbmZvXCI6e1wiY3VzdG9tZXJJZFwiOlwiYWJIZkQ0RXBRaWpTZ2pFdWlCb2tERXZtM1RcIixcImd1ZXN0XCI6ZmFsc2UsXCJ2aXNpdElkXCI6XCI2Y2M1MjIzNTFlYzJlYTYxMGUzMjY2MzM4NFwifX0ifQ.sMVXz7wrCUIxJJygmyrIzcfH4Ll8BQ_dZcrloj8KF-by9qeq4LwEISZ8w0wnwOdIjbi_cHsjhRoy0RBmvl_tBw\",\n    \"idp_refresh_token\": \"\"\n}"
+										}
+									]
+								},
+								{
+									"name": "SLAS - Private Client - Ecom User - Get Refresh Access Token",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													"var jsonBody= pm.response.json();",
+													"pm.collectionVariables.set(\"accessToken\", jsonBody.access_token);",
+													"pm.collectionVariables.set(\"b2cPrivateRefreshToken\", jsonBody.refresh_token);",
+													"pm.collectionVariables.set(\"customerID\", jsonBody.customer_id);",
+													"pm.collectionVariables.set(\"usid\", jsonBody.usid);"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "basic",
+											"basic": [
+												{
+													"key": "password",
+													"value": "{{slasPrivatePassword}}",
+													"type": "string"
+												},
+												{
+													"key": "username",
+													"value": "{{slasPrivateClientId}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/x-www-form-urlencoded"
+											}
+										],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "refresh_token",
+													"value": "{{b2cPrivateRefreshToken}}",
+													"type": "text"
+												},
+												{
+													"key": "grant_type",
+													"value": "refresh_token",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "https://{{shortCode}}.api.commercecloud.salesforce.com/shopper/auth/v1/organizations/{{organizationId}}/oauth2/token",
+											"protocol": "https",
+											"host": [
+												"{{shortCode}}",
+												"api",
+												"commercecloud",
+												"salesforce",
+												"com"
+											],
+											"path": [
+												"shopper",
+												"auth",
+												"v1",
+												"organizations",
+												"{{organizationId}}",
+												"oauth2",
+												"token"
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "200 OK",
+											"originalRequest": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/x-www-form-urlencoded"
+													}
+												],
+												"body": {
+													"mode": "urlencoded",
+													"urlencoded": [
+														{
+															"key": "refresh_token",
+															"value": "{{b2cPrivateRefreshToken}}",
+															"type": "text"
+														},
+														{
+															"key": "grant_type",
+															"value": "refresh_token",
+															"type": "text"
+														}
+													]
+												},
+												"url": {
+													"raw": "https://{{shortCode}}.api.commercecloud.salesforce.com/shopper/auth/v1/organizations/{{organizationId}}/oauth2/token",
+													"protocol": "https",
+													"host": [
+														"{{shortCode}}",
+														"api",
+														"commercecloud",
+														"salesforce",
+														"com"
+													],
+													"path": [
+														"shopper",
+														"auth",
+														"v1",
+														"organizations",
+														"{{organizationId}}",
+														"oauth2",
+														"token"
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Date",
+													"value": "Tue, 23 Apr 2024 08:25:55 GMT"
+												},
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												},
+												{
+													"key": "Transfer-Encoding",
+													"value": "chunked"
+												},
+												{
+													"key": "Connection",
+													"value": "keep-alive"
+												},
+												{
+													"key": "CF-Ray",
+													"value": "878c773c08a55cf6-MAD"
+												},
+												{
+													"key": "CF-Cache-Status",
+													"value": "DYNAMIC"
+												},
+												{
+													"key": "Cache-Control",
+													"value": "no-store"
+												},
+												{
+													"key": "Content-Encoding",
+													"value": "gzip"
+												},
+												{
+													"key": "Strict-Transport-Security",
+													"value": "max-age=31536000; includeSubDomains"
+												},
+												{
+													"key": "Vary",
+													"value": "Accept-Encoding, User-Agent"
+												},
+												{
+													"key": "pragma",
+													"value": "no-cache"
+												},
+												{
+													"key": "x-correlation-id",
+													"value": "878c773c08a55cf6"
+												},
+												{
+													"key": "x-ratelimit-1m-limit",
+													"value": "500"
+												},
+												{
+													"key": "x-ratelimit-1m-limit",
+													"value": "850000"
+												},
+												{
+													"key": "x-ratelimit-1m-remaining",
+													"value": "499"
+												},
+												{
+													"key": "x-ratelimit-1m-remaining",
+													"value": "797488"
+												},
+												{
+													"key": "x-ratelimit-1m-reset",
+													"value": "4101"
+												},
+												{
+													"key": "x-ratelimit-1m-reset",
+													"value": "4099"
+												},
+												{
+													"key": "Server",
+													"value": "cloudflare"
+												}
+											],
+											"cookie": [],
+											"body": "{\n    \"access_token\": \"eyJ2ZXIiOiIxLjAiLCJqa3UiOiJzbGFzL3Byb2QvYmZocV8wMDciLCJraWQiOiI1MDk2NGIzYi03ZDU3LTQ0MDItOTJmZS0zMGQzMzIyYTRmNTMiLCJ0eXAiOiJqd3QiLCJjbHYiOiJKMi4zLjQiLCJhbGciOiJFUzI1NiJ9.eyJhdXQiOiJHVUlEIiwic2NwIjoic2ZjYy5zaG9wcGVyLW15YWNjb3VudC5iYXNrZXRzIHNmY2Muc2hvcHBlci1kaXNjb3Zlcnktc2VhcmNoIHNmY2Muc2hvcHBlci1teWFjY291bnQuYWRkcmVzc2VzIHNmY2Muc2hvcHBlci1wcm9kdWN0cyBzZmNjLnNob3BwZXItbXlhY2NvdW50LnJ3IHNmY2Muc2hvcHBlci1teWFjY291bnQucGF5bWVudGluc3RydW1lbnRzIHNmY2Muc2hvcHBlci1jdXN0b21lcnMubG9naW4gc2ZjYy5zaG9wcGVyLXN0b3JlcyBzZmNjLnNob3BwZXItbXlhY2NvdW50Lm9yZGVycyBzZmNjLnNob3BwZXItYmFza2V0cy1vcmRlcnMgc2ZjYy5zaG9wcGVyLWN1c3RvbWVycy5yZWdpc3RlciBzZmNjLnNob3BwZXItbXlhY2NvdW50LmFkZHJlc3Nlcy5ydyBzZmNjLnNob3BwZXItbXlhY2NvdW50LnByb2R1Y3RsaXN0cy5ydyBzZmNjLnNob3BwZXItcHJvZHVjdGxpc3RzIHNmY2Muc2hvcHBlci1wcm9tb3Rpb25zIHNmY2Muc2hvcHBlci1iYXNrZXRzLW9yZGVycy5ydyBzZmNjLnNob3BwZXItZ2lmdC1jZXJ0aWZpY2F0ZXMgc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5wYXltZW50aW5zdHJ1bWVudHMucncgY19oZWxsb1dvcmxkX3J3IHNmY2Muc2hvcHBlci1wcm9kdWN0LXNlYXJjaCBzZmNjLnNob3BwZXItbXlhY2NvdW50LnByb2R1Y3RsaXN0cyBzZmNjLnNob3BwZXItY2F0ZWdvcmllcyBzZmNjLnNob3BwZXItbXlhY2NvdW50Iiwic3ViIjoiY2Mtc2xhczo6YmZocV8wMDc6OnNjaWQ6NmZkMWFjYmEtZmQ3NS00NWRiLTg5NTYtZDBkYWQ5MWQzODk0Ojp1c2lkOjkxMjY3YjA5LTk0MjMtNGQ1Ni1iN2UyLTdjNjE4NmU1NWMwZCIsImN0eCI6InNsYXMiLCJpc3MiOiJzbGFzL3Byb2QvYmZocV8wMDciLCJpc3QiOjEsImRudCI6IjAiLCJhdWQiOiJjb21tZXJjZWNsb3VkL3Byb2QvYmZocV8wMDciLCJuYmYiOjE3MTM4NjA3MjUsInN0eSI6IlVzZXIiLCJpc2IiOiJ1aWRvOmVjb206OnVwbjppdmFuLm1vbGwtbW9sbEBjYXBnZW1pbmkuY29tOjp1aWRuOm51bGwgTW9sbDo6Z2NpZDphYm1yY1dsSEJHa2JJUm1yb1drV1lZeGJzMDo6cmNpZDphYkhmRDRFcFFpalNnakV1aUJva0RFdm0zVDo6Y2hpZDpSZWZBcmNoIiwiZXhwIjoxNzEzODYyNTU1LCJpYXQiOjE3MTM4NjA3NTUsImp0aSI6IkMyQzc2MTUwNzg5NzAtMTYxNDc5MTE5MjUyMTc4ODYwNjMxMDUxMjkifQ.xBVsB4tKesdwlBYXEVSZUSkE-426lHJ1yWGpEGO_7mWY7MU1LDXfb0MvofCMiHAJdH4fjk4R9Cc40dyi-5bTwA\",\n    \"id_token\": \"eyJraWQiOiI5YTA5ZjFkYi0yNmYyLTQ4MjAtYWYyMi0zMjRkZTdmYjBkZTQiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJjYy1zbGFzOjpiZmhxXzAwNzo6c2NpZDo2ZmQxYWNiYS1mZDc1LTQ1ZGItODk1Ni1kMGRhZDkxZDM4OTQ6OnVzaWQ6OTEyNjdiMDktOTQyMy00ZDU2LWI3ZTItN2M2MTg2ZTU1YzBkIiwiYXVkIjoiNmZkMWFjYmEtZmQ3NS00NWRiLTg5NTYtZDBkYWQ5MWQzODk0IiwiaXNzIjoicHJkLnVzLnNob3BwZXIuY2Muc2FsZXNmb3JjZS5jb20iLCJuYW1lIjoiZWNvbSIsImV4cCI6MTcxMzg2MjU1NSwiaWF0IjoxNzEzODYwNzU1LCJlbWFpbCI6ImVjb20ifQ.M-onwuOsrXGdoyEhpnWhM3_1d_lmYTTPieteo8H3VGRdE1bSasMWDSe6AkUD5t3jLv4bCoEAZFAmqRrrTmhI73kTzYfbMHVrRSYOhZzDpLpeoIubo0mYXu5ZBw80okKWJMYiFq392dGuxJC1ahhmoH09NfYastFbZhyzTCm93nXNVFtPss2BN1GWyrBT8uZNoAntNpp2pF-2iSXQxot5bSp2J9D9bMStSLlYUbC056NOErbtPPixVIC2kSg3yhslKRDQcxRCdOKzJcqxJ9o4h7aZ_CfiaMbQvyQ-t2UqGFJFaUortDMqG-QD_61vCX_8jLVdkTbBL2JGG1ra1AWs4w\",\n    \"refresh_token\": \"CxrZgq5OypMaUzJWPzB09DgcH8S9e5cfKWKYbcGLdIo\",\n    \"expires_in\": 1800,\n    \"refresh_token_expires_in\": 7776000,\n    \"token_type\": \"BEARER\",\n    \"usid\": \"91267b09-9423-4d56-b7e2-7c6186e55c0d\",\n    \"customer_id\": \"abHfD4EpQijSgjEuiBokDEvm3T\",\n    \"enc_user_id\": \"547353dbb6dca0423bb4e67ba9bdfff3\",\n    \"idp_access_token\": \"eyJhbGciOiJFUzI1NiIsImtpZCI6IjE3MTEwMDc3MzE2OTIiLCJ0eXAiOiJKV1QifQ.eyJleHAiOjE3MTM4NjIzMDIsImlhdCI6MTcxMzg2MDUwMiwiaXNzIjoiY29tbWVyY2VjbG91ZC9wcm9kdWN0aW9uL2JmaHEtMDA3LWJlM2UyN2E0LTQwYjEtNDkxMy05YjE1LTU2ZDdhNWQ3OWIzMiIsInNjb3BlIjpbXSwic3ViIjoie1wiQ3VzdG9tZXJJbmZvXCI6e1wiY3VzdG9tZXJJZFwiOlwiYWJIZkQ0RXBRaWpTZ2pFdWlCb2tERXZtM1RcIixcImd1ZXN0XCI6ZmFsc2UsXCJ2aXNpdElkXCI6XCI2Y2M1MjIzNTFlYzJlYTYxMGUzMjY2MzM4NFwifX0ifQ.sMVXz7wrCUIxJJygmyrIzcfH4Ll8BQ_dZcrloj8KF-by9qeq4LwEISZ8w0wnwOdIjbi_cHsjhRoy0RBmvl_tBw\",\n    \"idp_refresh_token\": \"\"\n}"
+										}
+									]
+								}
+							],
+							"description": "- Traditional full stack web app\n- Any kind of app with a backend-for-frontend (BFF)"
+						}
+					]
+				},
+				{
+					"name": "Account Manager",
+					"item": [
+						{
+							"name": "Client Credentials grant",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if (pm.response.code === 200) {",
+											"    var tokenData = JSON.parse(responseBody);",
+											"    pm.collectionVariables.set(\"amAccessToken\", tokenData.access_token);",
+											"}"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "basic",
+									"basic": [
+										{
+											"key": "password",
+											"value": "{{amClientPassword}}",
+											"type": "string"
+										},
+										{
+											"key": "username",
+											"value": "{{amClientID}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "grant_type",
+											"value": "client_credentials",
+											"description": "Note that only the client_credentials grant type is supported for accessing SCAPI Admin APIs.",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "https://account.demandware.com/dwsso/oauth2/access_token",
+									"protocol": "https",
+									"host": [
+										"account",
+										"demandware",
+										"com"
+									],
+									"path": [
+										"dwsso",
+										"oauth2",
+										"access_token"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			],
+			"description": "[https://developer.salesforce.com/docs/commerce/commerce-api/guide/slas.html](https://developer.salesforce.com/docs/commerce/commerce-api/guide/slas.html)"
+		},
+		{
+			"name": "Endpoints v1",
+			"item": [
+				{
+					"name": "Hello World",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{shortCode}}.api.commercecloud.salesforce.com/custom/:customApi/v1/organizations/{{organizationId}}/:customEndpoint?siteId=RefArch&locale=es",
+							"protocol": "https",
+							"host": [
+								"{{shortCode}}",
+								"api",
+								"commercecloud",
+								"salesforce",
+								"com"
+							],
+							"path": [
+								"custom",
+								":customApi",
+								"v1",
+								"organizations",
+								"{{organizationId}}",
+								":customEndpoint"
+							],
+							"query": [
+								{
+									"key": "siteId",
+									"value": "RefArch",
+									"description": "Required"
+								},
+								{
+									"key": "locale",
+									"value": "es",
+									"description": "Optional"
+								}
+							],
+							"variable": [
+								{
+									"key": "customApi",
+									"value": "hello-world",
+									"description": "The name of the folder under rest-apis folder"
+								},
+								{
+									"key": "customEndpoint",
+									"value": "helloworld",
+									"description": "Defined into schema.yaml"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://{{shortCode}}.api.commercecloud.salesforce.com/custom/:customApi/v1/organizations/{{organizationId}}/:customEndpoint?siteId=RefArch&locale=es",
+									"protocol": "https",
+									"host": [
+										"{{shortCode}}",
+										"api",
+										"commercecloud",
+										"salesforce",
+										"com"
+									],
+									"path": [
+										"custom",
+										":customApi",
+										"v1",
+										"organizations",
+										"{{organizationId}}",
+										":customEndpoint"
+									],
+									"query": [
+										{
+											"key": "siteId",
+											"value": "RefArch"
+										},
+										{
+											"key": "locale",
+											"value": "es"
+										}
+									],
+									"variable": [
+										{
+											"key": "customApi",
+											"value": "hello-world",
+											"description": "The name of the folder under rest-apis folder"
+										},
+										{
+											"key": "customEndpoint",
+											"value": "helloworld",
+											"description": "Defined into schema.yaml"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Mon, 22 Apr 2024 16:00:13 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json;charset=UTF-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "27"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "CF-Ray",
+									"value": "8786d354b9ff86c9-MAD"
+								},
+								{
+									"key": "CF-Cache-Status",
+									"value": "DYNAMIC"
+								},
+								{
+									"key": "Accept-Ranges",
+									"value": "bytes"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, must-revalidate"
+								},
+								{
+									"key": "Expires",
+									"value": "Thu, 01 Dec 1994 16:00:00 GMT"
+								},
+								{
+									"key": "dnt",
+									"value": "0"
+								},
+								{
+									"key": "jweb",
+									"value": "y"
+								},
+								{
+									"key": "pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "x-correlation-id",
+									"value": "8786d354b9ff86c9"
+								},
+								{
+									"key": "x-envoy-upstream-service-time",
+									"value": "33"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept-Encoding"
+								},
+								{
+									"key": "Server",
+									"value": "cloudflare"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Hello World!\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Hello World",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Ivan\",\n    \"born\": \"08-06-1988\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{shortCode}}.api.commercecloud.salesforce.com/custom/:customApi/v1/organizations/{{organizationId}}/:customEndpoint?siteId=RefArch&locale=es",
+							"protocol": "https",
+							"host": [
+								"{{shortCode}}",
+								"api",
+								"commercecloud",
+								"salesforce",
+								"com"
+							],
+							"path": [
+								"custom",
+								":customApi",
+								"v1",
+								"organizations",
+								"{{organizationId}}",
+								":customEndpoint"
+							],
+							"query": [
+								{
+									"key": "siteId",
+									"value": "RefArch",
+									"description": "Required"
+								},
+								{
+									"key": "locale",
+									"value": "es",
+									"description": "Optional"
+								}
+							],
+							"variable": [
+								{
+									"key": "customApi",
+									"value": "hello-world",
+									"description": "The name of the folder under rest-apis folder"
+								},
+								{
+									"key": "customEndpoint",
+									"value": "helloworld",
+									"description": "Defined into schema.yaml"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 OK",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Ivan\",\n    \"born\": \"08-06-1988\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{shortCode}}.api.commercecloud.salesforce.com/custom/:customApi/v1/organizations/{{organizationId}}/:customEndpoint?siteId=RefArch&locale=es",
+									"protocol": "https",
+									"host": [
+										"{{shortCode}}",
+										"api",
+										"commercecloud",
+										"salesforce",
+										"com"
+									],
+									"path": [
+										"custom",
+										":customApi",
+										"v1",
+										"organizations",
+										"{{organizationId}}",
+										":customEndpoint"
+									],
+									"query": [
+										{
+											"key": "siteId",
+											"value": "RefArch",
+											"description": "Required"
+										},
+										{
+											"key": "locale",
+											"value": "es",
+											"description": "Optional"
+										}
+									],
+									"variable": [
+										{
+											"key": "customApi",
+											"value": "hello-world",
+											"description": "The name of the folder under rest-apis folder"
+										},
+										{
+											"key": "customEndpoint",
+											"value": "helloworld",
+											"description": "Defined into schema.yaml"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Fri, 03 May 2024 10:25:38 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json;charset=UTF-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "27"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "CF-Ray",
+									"value": "87df8c541f1b5e4d-MAD"
+								},
+								{
+									"key": "CF-Cache-Status",
+									"value": "DYNAMIC"
+								},
+								{
+									"key": "Accept-Ranges",
+									"value": "bytes"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, must-revalidate"
+								},
+								{
+									"key": "Expires",
+									"value": "Thu, 01 Dec 1994 16:00:00 GMT"
+								},
+								{
+									"key": "dnt",
+									"value": "0"
+								},
+								{
+									"key": "jweb",
+									"value": "y"
+								},
+								{
+									"key": "pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "x-correlation-id",
+									"value": "87df8c541f1b5e4d"
+								},
+								{
+									"key": "x-envoy-upstream-service-time",
+									"value": "11"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept-Encoding"
+								},
+								{
+									"key": "Server",
+									"value": "cloudflare"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Hello World!\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Hello World",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Ivan\",\n    \"born\": \"08-06-1988\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{shortCode}}.api.commercecloud.salesforce.com/custom/:customApi/v1/organizations/{{organizationId}}/:customEndpoint?siteId=RefArch&locale=es",
+							"protocol": "https",
+							"host": [
+								"{{shortCode}}",
+								"api",
+								"commercecloud",
+								"salesforce",
+								"com"
+							],
+							"path": [
+								"custom",
+								":customApi",
+								"v1",
+								"organizations",
+								"{{organizationId}}",
+								":customEndpoint"
+							],
+							"query": [
+								{
+									"key": "siteId",
+									"value": "RefArch",
+									"description": "Required"
+								},
+								{
+									"key": "locale",
+									"value": "es",
+									"description": "Optional"
+								}
+							],
+							"variable": [
+								{
+									"key": "customApi",
+									"value": "hello-world",
+									"description": "The name of the folder under rest-apis folder"
+								},
+								{
+									"key": "customEndpoint",
+									"value": "helloworld",
+									"description": "Defined into schema.yaml"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 OK",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Ivan\",\n    \"born\": \"08-06-1988\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{shortCode}}.api.commercecloud.salesforce.com/custom/:customApi/v1/organizations/{{organizationId}}/:customEndpoint?siteId=RefArch&locale=es",
+									"protocol": "https",
+									"host": [
+										"{{shortCode}}",
+										"api",
+										"commercecloud",
+										"salesforce",
+										"com"
+									],
+									"path": [
+										"custom",
+										":customApi",
+										"v1",
+										"organizations",
+										"{{organizationId}}",
+										":customEndpoint"
+									],
+									"query": [
+										{
+											"key": "siteId",
+											"value": "RefArch",
+											"description": "Required"
+										},
+										{
+											"key": "locale",
+											"value": "es",
+											"description": "Optional"
+										}
+									],
+									"variable": [
+										{
+											"key": "customApi",
+											"value": "hello-world",
+											"description": "The name of the folder under rest-apis folder"
+										},
+										{
+											"key": "customEndpoint",
+											"value": "helloworld",
+											"description": "Defined into schema.yaml"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Fri, 03 May 2024 10:26:30 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json;charset=UTF-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "27"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "CF-Ray",
+									"value": "87df8d9e2f2b5e4d-MAD"
+								},
+								{
+									"key": "CF-Cache-Status",
+									"value": "DYNAMIC"
+								},
+								{
+									"key": "Accept-Ranges",
+									"value": "bytes"
+								},
+								{
+									"key": "dnt",
+									"value": "0"
+								},
+								{
+									"key": "jweb",
+									"value": "y"
+								},
+								{
+									"key": "x-correlation-id",
+									"value": "87df8d9e2f2b5e4d"
+								},
+								{
+									"key": "x-envoy-upstream-service-time",
+									"value": "16"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept-Encoding"
+								},
+								{
+									"key": "Server",
+									"value": "cloudflare"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Hello World!\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Hello World",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Ivan\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{shortCode}}.api.commercecloud.salesforce.com/custom/:customApi/v1/organizations/{{organizationId}}/:customEndpoint?siteId=RefArch&locale=es",
+							"protocol": "https",
+							"host": [
+								"{{shortCode}}",
+								"api",
+								"commercecloud",
+								"salesforce",
+								"com"
+							],
+							"path": [
+								"custom",
+								":customApi",
+								"v1",
+								"organizations",
+								"{{organizationId}}",
+								":customEndpoint"
+							],
+							"query": [
+								{
+									"key": "siteId",
+									"value": "RefArch",
+									"description": "Required"
+								},
+								{
+									"key": "locale",
+									"value": "es",
+									"description": "Optional"
+								}
+							],
+							"variable": [
+								{
+									"key": "customApi",
+									"value": "hello-world",
+									"description": "The name of the folder under rest-apis folder"
+								},
+								{
+									"key": "customEndpoint",
+									"value": "helloworld",
+									"description": "Defined into schema.yaml"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 OK",
+							"originalRequest": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Ivan\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{shortCode}}.api.commercecloud.salesforce.com/custom/:customApi/v1/organizations/{{organizationId}}/:customEndpoint?siteId=RefArch&locale=es",
+									"protocol": "https",
+									"host": [
+										"{{shortCode}}",
+										"api",
+										"commercecloud",
+										"salesforce",
+										"com"
+									],
+									"path": [
+										"custom",
+										":customApi",
+										"v1",
+										"organizations",
+										"{{organizationId}}",
+										":customEndpoint"
+									],
+									"query": [
+										{
+											"key": "siteId",
+											"value": "RefArch",
+											"description": "Required"
+										},
+										{
+											"key": "locale",
+											"value": "es",
+											"description": "Optional"
+										}
+									],
+									"variable": [
+										{
+											"key": "customApi",
+											"value": "hello-world",
+											"description": "The name of the folder under rest-apis folder"
+										},
+										{
+											"key": "customEndpoint",
+											"value": "helloworld",
+											"description": "Defined into schema.yaml"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Fri, 03 May 2024 10:26:47 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json;charset=UTF-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "27"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "CF-Ray",
+									"value": "87df8e080a515e4d-MAD"
+								},
+								{
+									"key": "CF-Cache-Status",
+									"value": "DYNAMIC"
+								},
+								{
+									"key": "Accept-Ranges",
+									"value": "bytes"
+								},
+								{
+									"key": "dnt",
+									"value": "0"
+								},
+								{
+									"key": "jweb",
+									"value": "y"
+								},
+								{
+									"key": "x-correlation-id",
+									"value": "87df8e080a515e4d"
+								},
+								{
+									"key": "x-envoy-upstream-service-time",
+									"value": "16"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept-Encoding"
+								},
+								{
+									"key": "Server",
+									"value": "cloudflare"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Hello World!\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Hello World",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://{{shortCode}}.api.commercecloud.salesforce.com/custom/:customApi/v1/organizations/{{organizationId}}/:customEndpoint?siteId=RefArch&locale=es&c_name=Ivan",
+							"protocol": "https",
+							"host": [
+								"{{shortCode}}",
+								"api",
+								"commercecloud",
+								"salesforce",
+								"com"
+							],
+							"path": [
+								"custom",
+								":customApi",
+								"v1",
+								"organizations",
+								"{{organizationId}}",
+								":customEndpoint"
+							],
+							"query": [
+								{
+									"key": "siteId",
+									"value": "RefArch",
+									"description": "Required"
+								},
+								{
+									"key": "locale",
+									"value": "es",
+									"description": "Optional"
+								},
+								{
+									"key": "c_name",
+									"value": "Ivan",
+									"description": "Required"
+								}
+							],
+							"variable": [
+								{
+									"key": "customApi",
+									"value": "hello-world",
+									"description": "The name of the folder under rest-apis folder"
+								},
+								{
+									"key": "customEndpoint",
+									"value": "helloworld",
+									"description": "Defined into schema.yaml"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 OK",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "https://{{shortCode}}.api.commercecloud.salesforce.com/custom/:customApi/v1/organizations/{{organizationId}}/:customEndpoint?siteId=RefArch&locale=es&c_name=Ivan",
+									"protocol": "https",
+									"host": [
+										"{{shortCode}}",
+										"api",
+										"commercecloud",
+										"salesforce",
+										"com"
+									],
+									"path": [
+										"custom",
+										":customApi",
+										"v1",
+										"organizations",
+										"{{organizationId}}",
+										":customEndpoint"
+									],
+									"query": [
+										{
+											"key": "siteId",
+											"value": "RefArch",
+											"description": "Required"
+										},
+										{
+											"key": "locale",
+											"value": "es",
+											"description": "Optional"
+										},
+										{
+											"key": "c_name",
+											"value": "Ivan",
+											"description": "Required"
+										}
+									],
+									"variable": [
+										{
+											"key": "customApi",
+											"value": "hello-world",
+											"description": "The name of the folder under rest-apis folder"
+										},
+										{
+											"key": "customEndpoint",
+											"value": "helloworld",
+											"description": "Defined into schema.yaml"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Fri, 03 May 2024 10:27:45 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json;charset=UTF-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "27"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "CF-Ray",
+									"value": "87df8f724fdd5e4d-MAD"
+								},
+								{
+									"key": "CF-Cache-Status",
+									"value": "DYNAMIC"
+								},
+								{
+									"key": "Accept-Ranges",
+									"value": "bytes"
+								},
+								{
+									"key": "dnt",
+									"value": "0"
+								},
+								{
+									"key": "jweb",
+									"value": "y"
+								},
+								{
+									"key": "x-correlation-id",
+									"value": "87df8f724fdd5e4d"
+								},
+								{
+									"key": "x-envoy-upstream-service-time",
+									"value": "16"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept-Encoding"
+								},
+								{
+									"key": "Server",
+									"value": "cloudflare"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Hello World!\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Endpoints v2",
+			"item": [
+				{
+					"name": "Hello World",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{shortCode}}.api.commercecloud.salesforce.com/custom/:customApi/v2/organizations/{{organizationId}}/:customEndpoint?siteId=RefArch&locale=es&c_name=Ivan",
+							"protocol": "https",
+							"host": [
+								"{{shortCode}}",
+								"api",
+								"commercecloud",
+								"salesforce",
+								"com"
+							],
+							"path": [
+								"custom",
+								":customApi",
+								"v2",
+								"organizations",
+								"{{organizationId}}",
+								":customEndpoint"
+							],
+							"query": [
+								{
+									"key": "siteId",
+									"value": "RefArch",
+									"description": "Required"
+								},
+								{
+									"key": "locale",
+									"value": "es",
+									"description": "Optional"
+								},
+								{
+									"key": "c_name",
+									"value": "Ivan",
+									"description": "Required"
+								}
+							],
+							"variable": [
+								{
+									"key": "customApi",
+									"value": "hello-world",
+									"description": "The name of the folder under rest-apis folder"
+								},
+								{
+									"key": "customEndpoint",
+									"value": "helloworld",
+									"description": "Defined into schema_v2.yaml"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://{{shortCode}}.api.commercecloud.salesforce.com/custom/:customApi/v2/organizations/{{organizationId}}/:customEndpoint?siteId=RefArch&locale=es&c_name=Ivan",
+									"protocol": "https",
+									"host": [
+										"{{shortCode}}",
+										"api",
+										"commercecloud",
+										"salesforce",
+										"com"
+									],
+									"path": [
+										"custom",
+										":customApi",
+										"v2",
+										"organizations",
+										"{{organizationId}}",
+										":customEndpoint"
+									],
+									"query": [
+										{
+											"key": "siteId",
+											"value": "RefArch",
+											"description": "Required"
+										},
+										{
+											"key": "locale",
+											"value": "es",
+											"description": "Optional"
+										},
+										{
+											"key": "c_name",
+											"value": "Ivan",
+											"description": "Required"
+										}
+									],
+									"variable": [
+										{
+											"key": "customApi",
+											"value": "hello-world",
+											"description": "The name of the folder under rest-apis folder"
+										},
+										{
+											"key": "customEndpoint",
+											"value": "helloworld",
+											"description": "Defined into schema_v2.yaml"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Tue, 23 Apr 2024 07:13:30 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json;charset=UTF-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "47"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "CF-Ray",
+									"value": "878c0d25d8f82fc3-MAD"
+								},
+								{
+									"key": "CF-Cache-Status",
+									"value": "DYNAMIC"
+								},
+								{
+									"key": "Accept-Ranges",
+									"value": "bytes"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, must-revalidate"
+								},
+								{
+									"key": "Expires",
+									"value": "Thu, 01 Dec 1994 16:00:00 GMT"
+								},
+								{
+									"key": "dnt",
+									"value": "0"
+								},
+								{
+									"key": "jweb",
+									"value": "y"
+								},
+								{
+									"key": "pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "x-correlation-id",
+									"value": "878c0d25d8f82fc3"
+								},
+								{
+									"key": "x-envoy-upstream-service-time",
+									"value": "33"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept-Encoding"
+								},
+								{
+									"key": "Server",
+									"value": "cloudflare"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Hello Ivan welcome to the World!\"\n}"
+						},
+						{
+							"name": "400 Bad Request",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://{{shortCode}}.api.commercecloud.salesforce.com/custom/:customApi/v2/organizations/{{organizationId}}/:customEndpoint?siteId=RefArch&locale=es",
+									"protocol": "https",
+									"host": [
+										"{{shortCode}}",
+										"api",
+										"commercecloud",
+										"salesforce",
+										"com"
+									],
+									"path": [
+										"custom",
+										":customApi",
+										"v2",
+										"organizations",
+										"{{organizationId}}",
+										":customEndpoint"
+									],
+									"query": [
+										{
+											"key": "siteId",
+											"value": "RefArch",
+											"description": "Required"
+										},
+										{
+											"key": "locale",
+											"value": "es",
+											"description": "Optional"
+										},
+										{
+											"key": "c_name",
+											"value": "Ivan",
+											"description": "Required",
+											"disabled": true
+										}
+									],
+									"variable": [
+										{
+											"key": "customApi",
+											"value": "hello-world",
+											"description": "The name of the folder under rest-apis folder"
+										},
+										{
+											"key": "customEndpoint",
+											"value": "helloworld",
+											"description": "Defined into schema_v2.yaml"
+										}
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Tue, 23 Apr 2024 07:16:01 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/problem+json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "184"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "CF-Ray",
+									"value": "878c10d4b9d02fc3-MAD"
+								},
+								{
+									"key": "CF-Cache-Status",
+									"value": "DYNAMIC"
+								},
+								{
+									"key": "Accept-Ranges",
+									"value": "bytes"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, must-revalidate"
+								},
+								{
+									"key": "Expires",
+									"value": "Thu, 01 Dec 1994 16:00:00 GMT"
+								},
+								{
+									"key": "jweb",
+									"value": "y"
+								},
+								{
+									"key": "pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "x-correlation-id",
+									"value": "878c10d4b9d02fc3"
+								},
+								{
+									"key": "x-envoy-upstream-service-time",
+									"value": "13"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept-Encoding"
+								},
+								{
+									"key": "Server",
+									"value": "cloudflare"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"title\": \"Bad Request\",\n    \"type\": \"https://api.commercecloud.salesforce.com/documentation/error/v1/errors/missing-query-parameter\",\n    \"detail\": \"Missing required query parameter(s): 'c_name'\"\n}"
+						}
+					]
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "shortCode",
+			"value": "<Short code of your tenant>",
+			"type": "string"
+		},
+		{
+			"key": "organizationId",
+			"value": "<Organization Id of your tenant>",
+			"type": "string"
+		},
+		{
+			"key": "slasPublicClientId",
+			"value": "<Public client ID created on SLAS Admin UI>",
+			"type": "string"
+		},
+		{
+			"key": "slasPrivateClientId",
+			"value": "<Private client ID created on SLAS Admin UI>",
+			"type": "string"
+		},
+		{
+			"key": "slasPrivatePassword",
+			"value": "<Private password generated on SLAS Admin UI>",
+			"type": "string"
+		},
+		{
+			"key": "shopperUserID",
+			"value": "<Login of the customer of BM>",
+			"type": "string"
+		},
+		{
+			"key": "shopperPassword",
+			"value": "<Password of the customer of BM>",
+			"type": "string"
+		},
+		{
+			"key": "siteID",
+			"value": "<Site identifier>",
+			"type": "string"
+		},
+		{
+			"key": "slasRedirectUri",
+			"value": "<Redirect URI to work with SLAS>",
+			"type": "string"
+		},
+		{
+			"key": "PUBLIC_GUEST_CODE_CHALLENGE",
+			"value": "<Code challenge for a guest user auth flow>",
+			"type": "string"
+		},
+		{
+			"key": "PUBLIC_GUEST_CODE_VERIFIER",
+			"value": "<Code verifier for a guest user auth flow>",
+			"type": "string"
+		},
+		{
+			"key": "ECOM_USER_CODE_VERIFIER",
+			"value": "<Code verifier for a ecom user auth flow>",
+			"type": "string"
+		},
+		{
+			"key": "PUBLIC_ECOM_CODE_CHALLENGE",
+			"value": "<Code challenge for a ecom user auth flow>",
+			"type": "string"
+		},
+		{
+			"key": "PUBLIC_ECOM_CODE_VERIFIER",
+			"value": "<Code challenge for a ecom user auth flow>",
+			"type": "string"
+		},
+		{
+			"key": "ECOM_USER_CODE_CHALLENGE",
+			"value": "<Code challenge for a ecom user auth flow>",
+			"type": "string"
+		},
+		{
+			"key": "accessToken",
+			"value": "<Access token to make SCAPI requests>",
+			"type": "string"
+		},
+		{
+			"key": "guestPublicRefreshToken",
+			"value": "<Refresh token to refresh SCAPI guest user access token>",
+			"type": "string"
+		},
+		{
+			"key": "guestPrivateRefreshToken",
+			"value": "<Refresh token to refresh SCAPI guest user access token>",
+			"type": "string"
+		},
+		{
+			"key": "b2cPrivateRefreshToken",
+			"value": "<Refresh token to refresh SCAPI ecom user access token with private client id>",
+			"type": "string"
+		},
+		{
+			"key": "b2cPublicRefreshToken",
+			"value": "<Refresh token to refresh SCAPI ecom user access token with public client id>",
+			"type": "string"
+		},
+		{
+			"key": "customerID",
+			"value": "<Customer identifier>",
+			"type": "string"
+		},
+		{
+			"key": "usid",
+			"value": "<Unique shopper identifier>",
+			"type": "string"
+		},
+		{
+			"key": "authCode",
+			"value": "<Authorization code>",
+			"type": "string"
+		},
+		{
+			"key": "amClientID",
+			"value": "<Account Manager Client ID>"
+		},
+		{
+			"key": "amClientPassword",
+			"value": "<Account Manager Client Password>"
+		}
+	]
+}
